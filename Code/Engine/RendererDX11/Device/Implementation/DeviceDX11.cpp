@@ -1110,6 +1110,8 @@ const ezGALSharedTexture* ezGALDeviceDX11::GetSharedTexture(ezGALTextureHandle h
 
 ezGALDeviceDX11::TempResource ezGALDeviceDX11::CopyToTempBuffer(ezConstByteArrayPtr sourceData, ezUInt64 uiLastUseFrame /*= ezUInt64(-1)*/)
 {
+  EZ_GALDEVICE_LOCK_AND_CHECK();
+
   constexpr ezUInt32 uiExpGrowthLimit = 16 * 1024 * 1024;
 
   ezUInt32 uiSize = ezMath::Max(sourceData.GetCount(), 256U);
@@ -1181,6 +1183,8 @@ ezGALDeviceDX11::TempResource ezGALDeviceDX11::CopyToTempBuffer(ezConstByteArray
 
 ezGALDeviceDX11::TempResource ezGALDeviceDX11::CopyToTempTexture(const ezGALSystemMemoryDescription& sourceData, ezUInt32 uiWidth, ezUInt32 uiHeight, ezUInt32 uiDepth, ezGALResourceFormat::Enum format, ezUInt64 uiLastUseFrame /*= ezUInt64(-1)*/)
 {
+  EZ_GALDEVICE_LOCK_AND_CHECK();
+
   ezUInt32 hashData[] = {uiWidth, uiHeight, uiDepth, (ezUInt32)format};
   ezUInt32 uiHash = ezHashingUtils::xxHash32(hashData, sizeof(hashData));
 
