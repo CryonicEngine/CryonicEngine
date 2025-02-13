@@ -242,7 +242,7 @@ private:
   };
 
   ezMap<ezUInt32, ezDynamicArray<TempResource>, ezCompareHelper<ezUInt32>, ezLocalAllocatorWrapper> m_FreeTempResources[TempResourceType::ENUM_COUNT];
-  ezDeque<UsedTempResource, ezLocalAllocatorWrapper> m_UsedTempResources[TempResourceType::ENUM_COUNT];
+  ezDynamicArray<UsedTempResource, ezLocalAllocatorWrapper> m_UsedTempResources[TempResourceType::ENUM_COUNT];
 
   struct PendingCopy
   {

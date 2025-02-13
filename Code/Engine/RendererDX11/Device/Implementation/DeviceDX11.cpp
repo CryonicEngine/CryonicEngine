@@ -1281,10 +1281,12 @@ void ezGALDeviceDX11::FreeTempResources(ezUInt64 uiFrame)
 {
   for (ezUInt32 type = 0; type < TempResourceType::ENUM_COUNT; ++type)
   {
-    while (!m_UsedTempResources[type].IsEmpty())
+    auto& usedTempResources = m_UsedTempResources[type];
+
+    for (ezUInt32 i = 0; i < usedTempResources.GetCount();)
     {
-      auto& usedTempResource = m_UsedTempResources[type].PeekFront();
-      if (usedTempResource.m_uiFrame == uiFrame)
+      UsedTempResource& usedTempResource = usedTempResources[i];
+      if (usedTempResource.m_uiFrame <= uiFrame)
       {
         auto it = m_FreeTempResources[type].Find(usedTempResource.m_uiHash);
         if (!it.IsValid())
@@ -1303,11 +1305,11 @@ void ezGALDeviceDX11::FreeTempResources(ezUInt64 uiFrame)
         tempResources.m_uiRowPitch = mapped.RowPitch;
         tempResources.m_uiDepthPitch = mapped.DepthPitch;
 
-        m_UsedTempResources[type].PopFront();
+        usedTempResources.RemoveAtAndSwap(i);
       }
       else
       {
-        break;
+        ++i;
       }
     }
   }
