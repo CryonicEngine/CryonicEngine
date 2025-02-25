@@ -3,6 +3,7 @@
 #include <AngelScript/include/angelscript.h>
 #include <AngelScriptPlugin/Runtime/AsFunctionDispatch.h>
 #include <AngelScriptPlugin/Runtime/AsInstance.h>
+#include <AngelScriptPlugin/Utils/AngelScriptUtils.h>
 #include <Core/Scripting/ScriptComponent.h>
 #include <Core/Scripting/ScriptWorldModule.h>
 
@@ -41,6 +42,8 @@ void ezAngelScriptFunctionProperty::Execute(void* pInstance, ezArrayPtr<ezVarian
       bPush = true;
       AS_CHECK(pContext->PushState());
     }
+
+    ezAngelScriptUtils::SetThreadLocalWorld(pScriptInstance->GetWorld());
 
     ezTime tDiff;
 
@@ -99,6 +102,8 @@ void ezAngelScriptMessageHandler::Dispatch(ezAbstractMessageHandler* pSelf, void
     bPush = true;
     AS_CHECK(pContext->PushState());
   }
+
+  ezAngelScriptUtils::SetThreadLocalWorld(pScriptInstance->GetWorld());
 
   if (pContext->Prepare(pThis->m_pAsFunction) >= 0)
   {
@@ -166,6 +171,8 @@ void ezAngelScriptCustomAsMessageHandler::Dispatch(ezAbstractMessageHandler* pSe
       bPush = true;
       AS_CHECK(pContext->PushState());
     }
+
+    ezAngelScriptUtils::SetThreadLocalWorld(pScriptInstance->GetWorld());
 
     if (pContext->Prepare(r.m_pAsFunction) >= 0)
     {
