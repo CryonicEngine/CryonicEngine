@@ -149,7 +149,7 @@ bool ezPathComponent::get_Closed() const
 bool ezPhysics::OverlapTestCapsule(float Radius, float Height, ezTransform Transform, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
 bool ezPhysics::OverlapTestLine(ezVec3 Start, ezVec3 End, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 4294967295)
 bool ezPhysics::OverlapTestSphere(float Radius, ezVec3 Position, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
-bool ezPhysics::Raycast(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, ezVec3 Start, ezVec3 Direction, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes, uint IgnoreObjectID = 3)
+bool ezPhysics::Raycast(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, ezVec3 Start, ezVec3 Direction, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 4294967295)
 bool ezPhysics::RaycastSurfaceInteraction(ezVec3 RayStart, ezVec3 RayDirection, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes, ezStringView FallbackSurface, ezTempHashedString Interaction, float Impulse = 0, uint IgnoreObjectID = 4294967295)
 bool ezPhysics::SweepTestCapsule(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, float Height, ezTransform Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
 bool ezPhysics::SweepTestSphere(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, ezVec3 Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))

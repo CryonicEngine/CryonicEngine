@@ -14,9 +14,9 @@ EZ_BEGIN_STATIC_REFLECTED_TYPE(ezScriptExtensionClass_Physics, ezNoBase, 1, ezRT
     EZ_SCRIPT_FUNCTION_PROPERTY(GetCollisionLayerByName, In, "World", In, "Name"),
 
     EZ_SCRIPT_FUNCTION_PROPERTY(Raycast, Out, "HitPosition", Out, "HitNormal", Out, "HitObject", In, "World", In, "Start", In, "Direction", In, "CollisionLayer", In, "ShapeTypes", In, "IgnoreObjectID")->AddAttributes(
-      new ezFunctionArgumentAttributes(7, new ezDynamicEnumAttribute("PhysicsCollisionLayer")),
-      new ezFunctionArgumentAttributes(8, new ezDefaultValueAttribute((ezInt32)ezPhysicsShapeType::Static | (ezInt32)ezPhysicsShapeType::Dynamic)),
-      new ezFunctionArgumentAttributes(9, new ezDefaultValueAttribute((ezInt32)ezInvalidIndex))),
+      new ezFunctionArgumentAttributes(6, new ezDynamicEnumAttribute("PhysicsCollisionLayer")),
+      new ezFunctionArgumentAttributes(7, new ezDefaultValueAttribute((ezInt32)ezPhysicsShapeType::Static | (ezInt32)ezPhysicsShapeType::Dynamic)),
+      new ezFunctionArgumentAttributes(8, new ezDefaultValueAttribute((ezInt32)ezInvalidIndex))),
 
     EZ_SCRIPT_FUNCTION_PROPERTY(OverlapTestLine, In, "World", In, "Start", In, "End", In, "CollisionLayer", In, "ShapeTypes", In, "IgnoreObjectID")->AddAttributes(
       new ezFunctionArgumentAttributes(3, new ezDynamicEnumAttribute("PhysicsCollisionLayer")),

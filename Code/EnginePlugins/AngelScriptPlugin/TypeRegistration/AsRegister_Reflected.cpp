@@ -317,7 +317,8 @@ static void CollectFunctionArgumentAttributes(const ezAbstractFunctionProperty* 
     {
       ezUInt32 uiArgIndex = pFuncArgAttr->GetArgumentIndex();
       out_attributes.EnsureCount(uiArgIndex + 1);
-      EZ_ASSERT_DEV(out_attributes[uiArgIndex] == nullptr, "Multiple argument attributes for argument {}", uiArgIndex);
+      EZ_ASSERT_DEV(out_attributes[uiArgIndex] == nullptr, "Multiple argument attributes for argument {} of '{}'", uiArgIndex, pFuncProp->GetPropertyName());
+      EZ_ASSERT_DEV(uiArgIndex < pFuncProp->GetArgumentCount(), "Function argument attribute for argument {} of '{}' which only has {} arguments.", uiArgIndex, pFuncProp->GetPropertyName(), pFuncProp->GetArgumentCount());
       out_attributes[uiArgIndex] = pFuncArgAttr;
     }
   }

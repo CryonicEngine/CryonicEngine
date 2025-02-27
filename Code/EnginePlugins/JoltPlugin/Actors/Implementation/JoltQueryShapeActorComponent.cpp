@@ -114,7 +114,7 @@ void ezJoltQueryShapeActorComponent::OnSimulationStarted()
 
   m_uiJoltBodyID = pBody->GetID().GetIndexAndSequenceNumber();
 
-  pModule->QueueBodyToAdd(pBody, true);
+  pModule->QueueBodyToAdd(pBody, false);
 
   if (GetOwner()->IsDynamic())
   {

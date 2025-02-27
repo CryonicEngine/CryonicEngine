@@ -118,7 +118,7 @@ void ezJoltStaticActorComponent::OnSimulationStarted()
 
   m_uiJoltBodyID = pBody->GetID().GetIndexAndSequenceNumber();
 
-  pModule->QueueBodyToAdd(pBody, true);
+  pModule->QueueBodyToAdd(pBody, false);
 }
 
 void ezJoltStaticActorComponent::CreateShapes(ezDynamicArray<ezJoltSubShape>& out_Shapes, const ezTransform& rootTransform, float fDensity, const ezJoltMaterial* pMaterial)
