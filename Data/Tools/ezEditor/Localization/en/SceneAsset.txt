@@ -42,6 +42,7 @@ ezFillLightComponent;Fill Light;;https://ezengine.net/pages/docs/graphics/lighti
 ezPrefabReferenceComponent;Prefab Reference;;https://ezengine.net/pages/docs/prefabs/prefabs-overview.html
 ezProjectileComponent;Projectile;;https://ezengine.net/pages/docs/gameplay/projectile-component.html
 ezPropertyAnimComponent;Property Animation;;https://ezengine.net/pages/docs/animation/property-animation/property-animation-component.html
+ezRandomPrefabComponent;Random Prefab;;https://ezengine.net/pages/docs/prefabs/random-prefab-component.html
 ezRaycastComponent;Raycast Placement;;https://ezengine.net/pages/docs/gameplay/raycast-placement-component.html
 ezRenderTargetActivatorComponent;Render Target Activator;;https://ezengine.net/pages/docs/graphics/render-to-texture/render-target-activator-component.html
 ezRopeRenderComponent;Rope Renderer;;https://ezengine.net/pages/docs/effects/ropes/rope-render-component.html
