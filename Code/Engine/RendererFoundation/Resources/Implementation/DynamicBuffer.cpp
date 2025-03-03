@@ -41,6 +41,7 @@ ezGALDynamicBuffer::~ezGALDynamicBuffer()
 void ezGALDynamicBuffer::Initialize(const ezGALBufferCreationDescription& desc, ezStringView sDebugName)
 {
   EZ_ASSERT_DEV(desc.m_uiStructSize > 0, "Struct size must be greater than 0");
+  EZ_IGNORE_UNUSED(sDebugName);
 
   m_Desc = desc;
   m_Data.SetCountUninitialized(desc.m_uiTotalSize);
@@ -187,7 +188,10 @@ void ezGALDynamicBuffer::UploadChangesForNextFrame()
   if (m_hBufferForUpload.IsInvalidated())
   {
     m_hBufferForUpload = pDevice->CreateBuffer(m_Desc, m_Data);
+
+#if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
     pDevice->GetBuffer(m_hBufferForUpload)->SetDebugName(m_sDebugName);
+#endif
   }
   else
   {
