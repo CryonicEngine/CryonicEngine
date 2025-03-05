@@ -16,8 +16,8 @@ EZ_BEGIN_DYNAMIC_REFLECTED_TYPE(ezDepthOnlyPass, 3, ezRTTIDefaultAllocator<ezDep
   EZ_BEGIN_PROPERTIES
   {
     EZ_MEMBER_PROPERTY("DepthStencil", m_PinDepthStencil),
-    EZ_MEMBER_PROPERTY("RenderStaticObjects", m_bRenderStaticObjects),
-    EZ_MEMBER_PROPERTY("RenderDynamicObjects", m_bRenderDynamicObjects),
+    EZ_MEMBER_PROPERTY("RenderStaticObjects", m_bRenderStaticObjects)->AddAttributes(new ezDefaultValueAttribute(true)),
+    EZ_MEMBER_PROPERTY("RenderDynamicObjects", m_bRenderDynamicObjects)->AddAttributes(new ezDefaultValueAttribute(true)),
     EZ_MEMBER_PROPERTY("RenderTransparentObjects", m_bRenderTransparentObjects),
   }
   EZ_END_PROPERTIES;
