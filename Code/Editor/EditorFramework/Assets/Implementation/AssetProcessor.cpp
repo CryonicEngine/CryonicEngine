@@ -3,10 +3,11 @@
 #include <EditorFramework/Assets/AssetCurator.h>
 #include <EditorFramework/Assets/AssetProcessor.h>
 #include <EditorFramework/Assets/AssetProcessorMessages.h>
-#include <EditorFramework/EditorApp/EditorApp.moc.h>
+#include <EditorFramework/Preferences/EditorPreferences.h>
 #include <Foundation/Configuration/SubSystem.h>
 #include <GameEngine/GameApplication/GameApplication.h>
 #include <ToolsFoundation/Application/ApplicationServices.h>
+#include <ToolsFoundation/Project/ToolsProject.h>
 
 EZ_IMPLEMENT_SINGLETON(ezAssetProcessor);
 
@@ -96,7 +97,9 @@ void ezAssetProcessor::StartProcessTask()
 
   m_ProcessTaskState = ProcessTaskState::Running;
 
-  const ezUInt32 uiWorkerCount = ezTaskSystem::GetWorkerThreadCount(ezWorkerThreadType::LongTasks);
+  ezEditorPreferencesUser* pPreferences = ezPreferences::QueryPreferences<ezEditorPreferencesUser>();
+
+  const ezUInt32 uiWorkerCount = ezMath::Min<ezUInt32>(ezTaskSystem::GetWorkerThreadCount(ezWorkerThreadType::LongTasks), pPreferences->m_uiMaxAssetProcessors);
   m_ProcessTasks.SetCount(uiWorkerCount);
 
   for (ezUInt32 idx = 0; idx < uiWorkerCount; ++idx)
