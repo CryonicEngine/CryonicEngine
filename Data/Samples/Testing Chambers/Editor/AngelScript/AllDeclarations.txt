@@ -84,7 +84,6 @@ bool ezGameObjectHandle::IsInvalidated() const
 bool ezGameObjectHandle::opEquals(ezGameObjectHandle) const
 bool ezGrabbableItemComponent::get_DebugShowPoints() const
 bool ezGreyBoxComponent::get_GenerateCollision() const
-bool ezGreyBoxComponent::get_IncludeInNavmesh() const
 bool ezGreyBoxComponent::get_SlopedBottom() const
 bool ezGreyBoxComponent::get_SlopedTop() const
 bool ezGreyBoxComponent::get_UseAsOccluder() const
@@ -93,7 +92,6 @@ bool ezHashedString::opEquals(const ezHashedString&in) const
 bool ezHashedString::opEquals(const ezStringView) const
 bool ezHashedString::opEquals(const ezTempHashedString&in) const
 bool ezHeightfieldComponent::get_GenerateCollision() const
-bool ezHeightfieldComponent::get_IncludeInNavmesh() const
 bool ezInputComponent::get_ForwardToBlackboard() const
 bool ezJointOverrideComponent::get_OverridePosition() const
 bool ezJointOverrideComponent::get_OverrideRotation() const
@@ -114,7 +112,6 @@ bool ezJoltHitboxComponent::get_QueryShapeOnly() const
 bool ezJoltRagdollComponent::get_SelfCollision() const
 bool ezJoltRopeComponent::get_ContinuousCollisionDetection() const
 bool ezJoltRopeComponent::get_SelfCollision() const
-bool ezJoltStaticActorComponent::get_IncludeInNavmesh() const
 bool ezJoltStaticActorComponent::get_PullSurfacesFromGraphicsMesh() const
 bool ezLensFlareComponent::get_ApplyFog() const
 bool ezLensFlareComponent::get_LinkToLightShape() const
@@ -2498,7 +2495,6 @@ void ezGreyBoxComponent::set_Curvature(ezAngle)
 void ezGreyBoxComponent::set_CustomData(ezVec4)
 void ezGreyBoxComponent::set_Detail(uint)
 void ezGreyBoxComponent::set_GenerateCollision(bool)
-void ezGreyBoxComponent::set_IncludeInNavmesh(bool)
 void ezGreyBoxComponent::set_Material(ezStringView)
 void ezGreyBoxComponent::set_Shape(ezGreyBoxShape)
 void ezGreyBoxComponent::set_SizeNegX(float)
@@ -2521,7 +2517,6 @@ void ezHeightfieldComponent::set_GenerateCollision(bool)
 void ezHeightfieldComponent::set_HalfExtents(ezVec2)
 void ezHeightfieldComponent::set_Height(float)
 void ezHeightfieldComponent::set_HeightfieldImage(ezStringView)
-void ezHeightfieldComponent::set_IncludeInNavmesh(bool)
 void ezHeightfieldComponent::set_Material(ezStringView)
 void ezHeightfieldComponent::set_TexCoordOffset(ezVec2)
 void ezHeightfieldComponent::set_TexCoordScale(ezVec2)
@@ -2663,7 +2658,6 @@ void ezJoltSliderConstraintComponent::set_LimitMode(ezJoltConstraintLimitMode)
 void ezJoltSliderConstraintComponent::set_LowerLimit(float)
 void ezJoltSliderConstraintComponent::set_UpperLimit(float)
 void ezJoltStaticActorComponent::set_CollisionMesh(ezStringView)
-void ezJoltStaticActorComponent::set_IncludeInNavmesh(bool)
 void ezJoltStaticActorComponent::set_PullSurfacesFromGraphicsMesh(bool)
 void ezJoltStaticActorComponent::set_Surface(ezStringView)
 void ezJoltSwingTwistConstraintComponent::set_Friction(float)

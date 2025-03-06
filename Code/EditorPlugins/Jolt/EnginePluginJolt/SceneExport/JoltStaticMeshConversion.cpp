@@ -101,7 +101,7 @@ void ezSceneExportModifier_JoltStaticMeshConversion::ModifyWorld(ezWorld& ref_wo
   file.SetOutput(sOutputFile);
 
   ezAssetFileHeader header;
-  header.SetFileHashAndVersion(0, 9); // ezGetStaticRTTI<ezJoltCollisionMeshAssetDocument>()->GetTypeVersion();
+  header.SetFileHashAndVersion(0, 10); // ezGetStaticRTTI<ezJoltCollisionMeshAssetDocument>()->GetTypeVersion();
   header.Write(file).IgnoreResult();
 
   const ezUInt8 uiVersion = 3;

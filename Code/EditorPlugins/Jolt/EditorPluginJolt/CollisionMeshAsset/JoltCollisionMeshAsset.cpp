@@ -65,7 +65,7 @@ ezTransformStatus ezJoltCollisionMeshAssetDocument::InternalTransformAsset(ezStr
 
   ezJoltCollisionMeshAssetProperties* pProp = GetProperties();
 
-  EZ_ASSERT_DEV(AssetHeader.GetFileVersion() == 9, "Version change");
+  EZ_ASSERT_DEV(AssetHeader.GetFileVersion() == 10, "Version change");
   // Please check that the code here is in sync with ezSceneExportModifier_JoltStaticMeshConversion::ModifyWorld()
 
   const ezUInt8 uiVersion = 3; // read in ezJoltMeshResource::UpdateContent()

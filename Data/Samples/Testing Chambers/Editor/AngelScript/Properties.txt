@@ -210,7 +210,6 @@ IgnoreOwnerRotation
 Image
 ImpactDirection
 Impulse
-IncludeInNavmesh
 IndianRed
 Indigo
 InfluenceScale

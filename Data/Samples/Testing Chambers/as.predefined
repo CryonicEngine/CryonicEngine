@@ -2106,7 +2106,6 @@ class ezGreyBoxComponent : ezRenderComponent
   bool SlopedTop;
   bool SlopedBottom;
   bool GenerateCollision;
-  bool IncludeInNavmesh;
   bool UseAsOccluder;
 }
 
@@ -2468,7 +2467,6 @@ class ezHeightfieldComponent : ezRenderComponent
   ezVec2 TexCoordOffset;
   ezVec2 TexCoordScale;
   bool GenerateCollision;
-  bool IncludeInNavmesh;
 }
 
 class ezJoltActorComponent : ezComponent
@@ -2510,7 +2508,6 @@ class ezJoltQueryShapeActorComponent : ezJoltActorComponent
 class ezJoltStaticActorComponent : ezJoltActorComponent
 {
   ezStringView CollisionMesh;
-  bool IncludeInNavmesh;
   bool PullSurfacesFromGraphicsMesh;
   ezStringView Surface;
 }
