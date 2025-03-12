@@ -67,9 +67,8 @@ ezQtSceneDocumentWindow::ezQtSceneDocumentWindow(ezSceneDocument* pDocument)
   if (GetSceneDocument()->IsPrefab())
   {
     ezQtDocumentPanel* pPanel = new ezQtDocumentPanel(GetContainerWindow()->GetDockManager(), this, pDocument);
-    pPanel->setObjectName("SceneSettingsDockWidget");
-    pPanel->setWindowTitle(GetSceneDocument()->IsPrefab() ? "Prefab Settings" : "Scene Settings");
-    pPanel->show();
+    pPanel->setObjectName("PrefabSettingsPanel");
+    pPanel->setWindowTitle("Prefab Settings");
 
     ezQtPropertyGridWidget* pPropertyGrid = new ezQtPropertyGridWidget(pPanel, pDocument, false);
     ezDeque<const ezDocumentObject*> selection;
@@ -80,11 +79,11 @@ ezQtSceneDocumentWindow::ezQtSceneDocumentWindow(ezSceneDocument* pDocument)
     m_pDockManager->addDockWidgetTab(ads::RightDockWidgetArea, pPanel);
   }
 
+  // Properties
   {
     ezQtDocumentPanel* pPropertyPanel = new ezQtDocumentPanel(GetContainerWindow()->GetDockManager(), this, pDocument);
     pPropertyPanel->setObjectName("PropertyPanel");
     pPropertyPanel->setWindowTitle("Properties");
-    pPropertyPanel->show();
 
     ezQtDocumentPanel* pPanelTree = new ezQtScenegraphPanel(GetContainerWindow()->GetDockManager(), this, static_cast<ezSceneDocument*>(pDocument));
     pPanelTree->show();

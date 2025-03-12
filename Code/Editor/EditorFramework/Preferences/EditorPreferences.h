@@ -24,7 +24,7 @@ public:
   bool m_bUsePrecompiledTools = true;
   ezString m_sCustomPrecompiledToolsFolder;
   bool m_bLoadLastProjectAtStartup = true;
-  bool m_bShowSplashscreen = true;
+  bool m_bShowSplashscreen = false;
   bool m_bExpandSceneTreeOnSelection = true;
   bool m_bBackgroundAssetProcessing = true;
   ezUInt8 m_uiMaxAssetProcessors = 8;

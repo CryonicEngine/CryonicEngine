@@ -365,13 +365,13 @@ void ezQtDocumentWindow::SaveWindowLayout()
     showNormal();
 
   ezStringBuilder sGroup;
-  sGroup.SetFormat("DocWndLayout_{0}", GetWindowLayoutGroupName());
+  sGroup.SetFormat("DocWndLayout2_{0}", GetWindowLayoutGroupName());
 
   QSettings Settings;
   Settings.beginGroup(QString::fromUtf8(sGroup, sGroup.GetElementCount()));
   {
     // All other properties are defined by the outer container window.
-    Settings.setValue("DocWndState", m_pDockManager->saveState());
+    Settings.setValue("DocWndState2", m_pDockManager->saveState());
   }
   Settings.endGroup();
 }
@@ -389,7 +389,7 @@ void ezQtDocumentWindow::RestoreWindowLayout(bool bForce)
   ezQtScopedUpdatesDisabled _(this);
 
   ezStringBuilder sGroup;
-  sGroup.SetFormat("DocWndLayout_{0}", GetWindowLayoutGroupName());
+  sGroup.SetFormat("DocWndLayout2_{0}", GetWindowLayoutGroupName());
 
   {
     ezHybridArray<QWidget*, 8> docks;
@@ -404,7 +404,7 @@ void ezQtDocumentWindow::RestoreWindowLayout(bool bForce)
     QSettings Settings;
     Settings.beginGroup(QString::fromUtf8(sGroup, sGroup.GetElementCount()));
     {
-      m_pDockManager->restoreState(Settings.value("DocWndState", m_pDockManager->saveState()).toByteArray());
+      m_pDockManager->restoreState(Settings.value("DocWndState2", m_pDockManager->saveState()).toByteArray());
     }
     Settings.endGroup();
   }
