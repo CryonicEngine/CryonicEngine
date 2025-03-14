@@ -194,8 +194,12 @@ ezStringView ezCommandLineUtils::GetStringOption(ezStringView sOption, ezUInt32 
 
     // found the right one, return it
     if (uiParamCount == uiArgument)
-      return m_Commands[uiParam].GetData();
-
+    {
+      // We trim " as this is automatically done on Windows when parsing command line arguments and this will make it behave the same on Linux.
+      ezStringView sData = m_Commands[uiParam].GetView();
+      sData.Trim("\"");
+      return sData;
+    }
     ++uiParamCount;
   }
 
@@ -205,7 +209,6 @@ ezStringView ezCommandLineUtils::GetStringOption(ezStringView sOption, ezUInt32 
 const ezString ezCommandLineUtils::GetAbsolutePathOption(ezStringView sOption, ezUInt32 uiArgument /*= 0*/, ezStringView sDefault /*= {} */, bool bCaseSensitive /*= false*/) const
 {
   ezStringView sPath = GetStringOption(sOption, uiArgument, sDefault, bCaseSensitive);
-
   if (sPath.IsEmpty())
     return sPath;
 

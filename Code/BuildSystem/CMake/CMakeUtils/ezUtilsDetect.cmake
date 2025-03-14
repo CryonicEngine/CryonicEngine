@@ -263,6 +263,7 @@ function(ez_detect_compiler_and_architecture)
 			set_property(GLOBAL PROPERTY EZ_CMAKE_ARCHITECTURE_POSTFIX "64")
 		endif()
 	endif()
+
 endfunction()
 
 # #####################################
@@ -270,6 +271,23 @@ endfunction()
 # #####################################
 macro(ez_pull_compiler_and_architecture_vars)
 	ez_detect_compiler_and_architecture()
+
+	# Enable assember language support. Needed for AngelScript.
+	# enable_language is not cached and must thus be run here instead of in ez_detect_compiler_and_architecture as the early out at the start would of the function would disable ASM support again. This quirk for some reason only happens on Windows compiling for Android.
+	if(EZ_CMAKE_COMPILER_MSVC AND EZ_CMAKE_ARCHITECTURE_64BIT)
+		enable_language(ASM_MASM)
+		if(NOT CMAKE_ASM_MASM_COMPILER_WORKS)
+			message(FATAL_ERROR "MSVC x86_64 target requires a working assembler")
+		endif()
+	endif()
+
+	if(EZ_CMAKE_ARCHITECTURE_ARM)
+		enable_language(ASM)
+		if(NOT CMAKE_ASM_COMPILER_WORKS)
+			message(FATAL_ERROR "ARM target requires a working assembler")
+		endif()
+	endif()
+	enable_language(ASM)
 
 	get_property(EZ_CMAKE_COMPILER_POSTFIX GLOBAL PROPERTY EZ_CMAKE_COMPILER_POSTFIX)
 	get_property(EZ_CMAKE_COMPILER_MSVC GLOBAL PROPERTY EZ_CMAKE_COMPILER_MSVC)
