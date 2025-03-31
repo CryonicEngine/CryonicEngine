@@ -16,6 +16,10 @@ void ezResourceManager::InternalPreloadResource(ezResource* pResource, bool bHig
   if (s_pState->m_bShutdown)
     return;
 
+  // Runtime created resources without loaders are not loaded via tasks but created on the stack directly.
+  if (pResource->GetBaseResourceFlags().IsSet(ezResourceFlags::IsCreatedResource) && !pResource->GetBaseResourceFlags().IsSet(ezResourceFlags::HasCustomDataLoader))
+    return;
+
   EZ_LOCK(s_ResourceMutex);
 
   // if there is nothing else that could be loaded, just return right away
