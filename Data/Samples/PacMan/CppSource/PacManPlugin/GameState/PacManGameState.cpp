@@ -1,6 +1,7 @@
 #include <PacManPlugin/PacManPluginPCH.h>
 
 #include <Core/Input/InputManager.h>
+#include <Core/Interfaces/SoundInterface.h>
 #include <Core/System/Window.h>
 #include <Core/Utils/Blackboard.h>
 #include <Core/World/World.h>
@@ -61,6 +62,14 @@ void PacManGameState::OnActivation(ezWorld* pWorld, ezStringView sStartPosition,
     m_pRightStick->SetAreaFocusMode(ezInputActionConfig::OnEnterArea::RequireKeyUp, ezInputActionConfig::OnLeaveArea::LoseFocus);
     m_pRightStick->SetEnabled(false);
   }
+
+  if (ezSoundInterface* pSoundInterface = ezSingletonRegistry::GetSingletonInstance<ezSoundInterface>())
+  {
+    // adjust the volume of the sound groups
+    // this would usually be a user setting
+    pSoundInterface->SetSoundGroupVolume("Music", 0.7f);
+    pSoundInterface->SetSoundGroupVolume("Effects", 0.9f);
+  }
 }
 
 
@@ -116,7 +125,7 @@ void PacManGameState::AfterWorldUpdate()
 
     // play a sound, the GUID of the sound asset was copied from the editor
     // ezSoundInterface::PlaySound("{ a10b9065-0b4d-4eff-a9ac-2f712dc28c1c }", ezTransform::MakeIdentity()).IgnoreResult(); // FMOD
-    ezSoundInterface::PlaySound("{ 2281d82a-cf87-4747-b664-a41ebc74c052 }", ezTransform::MakeIdentity()).IgnoreResult(); // MiniAudio
+    ezSoundInterface::PlaySound(m_pMainWorld, "{ 2281d82a-cf87-4747-b664-a41ebc74c052 }", ezTransform::MakeIdentity()).IgnoreResult(); // MiniAudio
   }
 
   if (iPacManState == PacManState::EatenByGhost)

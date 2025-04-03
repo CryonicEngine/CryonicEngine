@@ -44,6 +44,42 @@ float ezMiniAudioSoundResource::GetPitch(ezRandom& ref_rng) const
   return m_fMinPitch;
 }
 
+ezMiniAudioSoundInstance* ezMiniAudioSoundResource::InstantiateSound(ezRandom* pRng, ezWorld* pWorld, ezComponentHandle hComponent)
+{
+  ezMiniAudioSingleton* pMA = ezMiniAudioSingleton::GetSingleton();
+
+  ezMiniAudioSoundInstance* pInstance = nullptr;
+
+  ma_sound_group* pGroup = nullptr;
+
+  if (!m_sSoundGroup.IsEmpty())
+  {
+    pGroup = pMA->GetSoundGroup(m_sSoundGroup).m_pGroup.Borrow();
+  }
+
+  if (pRng)
+  {
+    pInstance = pMA->AllocateSoundInstance(GetAudioData(*pRng), pWorld, hComponent, pGroup);
+  }
+  else
+  {
+    pInstance = pMA->AllocateSoundInstance(GetAudioData(), pWorld, hComponent, pGroup);
+  }
+
+
+
+  EZ_MA_CHECK(ma_data_source_set_looping(&pInstance->m_Decoder, GetLoop()));
+
+  ma_sound_set_min_distance(&pInstance->m_Sound, GetMinDistance());
+  // ma_sound_set_max_distance(&pInstance->m_Sound, GetMaxDistance());
+  // ma_sound_set_attenuation_model(&pInstance->m_Sound, ma_attenuation_model_exponential);
+  ma_sound_set_rolloff(&pInstance->m_Sound, GetRolloff());
+  ma_sound_set_doppler_factor(&pInstance->m_Sound, GetDopplerFactor());
+  ma_sound_set_spatialization_enabled(&pInstance->m_Sound, GetSpatialize());
+
+  return pInstance;
+}
+
 ezResourceLoadDesc ezMiniAudioSoundResource::UnloadData(Unload WhatToUnload)
 {
   m_AudioData.Clear();
@@ -120,6 +156,11 @@ ezResourceLoadDesc ezMiniAudioSoundResource::UpdateContent(ezStreamReader* pStre
       res.m_State = ezResourceState::LoadedResourceMissing;
       return res;
     }
+  }
+
+  if (uiVersion >= 2)
+  {
+    *pStream >> m_sSoundGroup;
   }
 
   res.m_State = ezResourceState::Loaded;

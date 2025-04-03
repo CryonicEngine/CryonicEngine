@@ -33,6 +33,9 @@ public:
   float GetMaxDistance() const { return m_fMaxDistance; }
   float GetRolloff() const { return m_fRolloff; }
 
+  /// \brief Instantiates the sound, all arguments are optional.
+  ezMiniAudioSoundInstance* InstantiateSound(ezRandom* pRng, ezWorld* pWorld, ezComponentHandle hComponent);
+
 private:
   virtual ezResourceLoadDesc UnloadData(Unload WhatToUnload) override;
   virtual ezResourceLoadDesc UpdateContent(ezStreamReader* pStream) override;
@@ -41,6 +44,7 @@ private:
 private:
   ezHybridArray<ezDataBuffer, 1> m_AudioData;
 
+  ezString m_sSoundGroup;
   bool m_bLoop = false;
   float m_fMinVolume = 1.0f;
   float m_fMaxVolume = 1.0f;
