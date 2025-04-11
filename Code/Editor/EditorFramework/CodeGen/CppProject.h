@@ -14,16 +14,13 @@ struct EZ_EDITORFRAMEWORK_DLL ezIDE
 
   enum Enum
   {
-    VisualStudioCode,
+    DefaultProgram, // Uses the system default way of opening an sln file
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS)
     VisualStudio,
 #endif
-
-#if EZ_ENABLED(EZ_PLATFORM_WINDOWS)
-    Default = VisualStudio
-#else
-    Default = VisualStudioCode
-#endif
+    VisualStudioCode,
+    Rider,
+    Default = DefaultProgram
   };
 };
 
