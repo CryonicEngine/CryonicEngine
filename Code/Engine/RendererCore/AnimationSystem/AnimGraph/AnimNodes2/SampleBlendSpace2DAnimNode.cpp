@@ -22,14 +22,13 @@ EZ_BEGIN_STATIC_REFLECTED_TYPE(ezAnimationClip2D, ezNoBase, 1, ezRTTIDefaultAllo
 }
 EZ_END_STATIC_REFLECTED_TYPE;
 
-EZ_BEGIN_DYNAMIC_REFLECTED_TYPE(ezSampleBlendSpace2DAnimNode, 1, ezRTTIDefaultAllocator<ezSampleBlendSpace2DAnimNode>)
+EZ_BEGIN_DYNAMIC_REFLECTED_TYPE(ezSampleBlendSpace2DAnimNode, 2, ezRTTIDefaultAllocator<ezSampleBlendSpace2DAnimNode>)
   {
     EZ_BEGIN_PROPERTIES
     {
       EZ_MEMBER_PROPERTY("Loop", m_bLoop)->AddAttributes(new ezDefaultValueAttribute(true)),
       EZ_MEMBER_PROPERTY("PlaybackSpeed", m_fPlaybackSpeed)->AddAttributes(new ezDefaultValueAttribute(1.0f), new ezClampValueAttribute(0.0f, {})),
-      EZ_MEMBER_PROPERTY("ApplyRootMotion", m_bApplyRootMotion),
-      EZ_MEMBER_PROPERTY("RootMotionAmount", m_fRootMotionAmount)->AddAttributes(new ezDefaultValueAttribute(1.0f), new ezClampValueAttribute(0.0f, 100.0f)),
+      EZ_MEMBER_PROPERTY("RootMotionAmount", m_fRootMotionAmount)->AddAttributes(new ezDefaultValueAttribute(0.0f), new ezClampValueAttribute(0.0f, 100.0f)),
       EZ_MEMBER_PROPERTY("InputResponse", m_InputResponse)->AddAttributes(new ezDefaultValueAttribute(ezTime::MakeFromMilliseconds(100))),
     EZ_ACCESSOR_PROPERTY("CenterClip", GetCenterClipFile, SetCenterClipFile)->AddAttributes(new ezDynamicStringEnumAttribute("AnimationClipMappingEnum")),
       EZ_ARRAY_MEMBER_PROPERTY("Clips", m_Clips),
@@ -71,7 +70,7 @@ ezSampleBlendSpace2DAnimNode::~ezSampleBlendSpace2DAnimNode() = default;
 
 ezResult ezSampleBlendSpace2DAnimNode::SerializeNode(ezStreamWriter& stream) const
 {
-  stream.WriteVersion(2);
+  stream.WriteVersion(3);
 
   EZ_SUCCEED_OR_RETURN(SUPER::SerializeNode(stream));
 
@@ -85,7 +84,6 @@ ezResult ezSampleBlendSpace2DAnimNode::SerializeNode(ezStreamWriter& stream) con
   }
 
   stream << m_bLoop;
-  stream << m_bApplyRootMotion;
   stream << m_fRootMotionAmount;
   stream << m_fPlaybackSpeed;
   stream << m_InputResponse;
@@ -104,7 +102,7 @@ ezResult ezSampleBlendSpace2DAnimNode::SerializeNode(ezStreamWriter& stream) con
 
 ezResult ezSampleBlendSpace2DAnimNode::DeserializeNode(ezStreamReader& stream)
 {
-  const auto version = stream.ReadVersion(2);
+  const auto version = stream.ReadVersion(3);
 
   EZ_SUCCEED_OR_RETURN(SUPER::DeserializeNode(stream));
 
@@ -120,7 +118,13 @@ ezResult ezSampleBlendSpace2DAnimNode::DeserializeNode(ezStreamReader& stream)
   }
 
   stream >> m_bLoop;
-  stream >> m_bApplyRootMotion;
+
+  if (version <= 2)
+  {
+    bool bApplyRootMotion = false;
+    stream >> bApplyRootMotion;
+    m_fRootMotionAmount = bApplyRootMotion ? 1.0f : 0.0f;
+  }
 
   if (version >= 2)
   {
@@ -413,7 +417,7 @@ void ezSampleBlendSpace2DAnimNode::PlayClips(ezAnimController& ref_controller, c
 
   ezAnimGraphPinDataLocalTransforms* pOutputTransform = ref_controller.AddPinDataLocalTransforms();
 
-  if (m_bApplyRootMotion && m_fRootMotionAmount > 0.0f)
+  if (m_fRootMotionAmount != 0.0f)
   {
     pOutputTransform->m_bUseRootMotion = true;
 
@@ -471,5 +475,36 @@ bool ezSampleBlendSpace2DAnimNode::GetInstanceDataDesc(ezInstanceDataDesc& out_d
   return true;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+#include <Foundation/Serialization/AbstractObjectGraph.h>
+#include <Foundation/Serialization/GraphPatch.h>
+
+class ezSampleBlendSpace2DAnimNodePatch_1_2 : public ezGraphPatch
+{
+public:
+  ezSampleBlendSpace2DAnimNodePatch_1_2()
+    : ezGraphPatch("ezSampleBlendSpace2DAnimNode", 2)
+  {
+  }
+
+  virtual void Patch(ezGraphPatchContext& ref_context, ezAbstractObjectGraph* pGraph, ezAbstractObjectNode* pNode) const override
+  {
+    if (auto pProp = pNode->FindProperty("ApplyRootMotion"))
+    {
+      if (pProp->m_Value.IsA<bool>())
+      {
+        const bool bApply = pProp->m_Value.Get<bool>();
+
+        if (bApply)
+        {
+          pNode->AddProperty("RootMotionAmount", 1.0f);
+        }
+      }
+    }
+  }
+};
+
+ezSampleBlendSpace2DAnimNodePatch_1_2 g_ezSampleBlendSpace2DAnimNodePatch_1_2;
 
 EZ_STATICLINK_FILE(RendererCore, RendererCore_AnimationSystem_AnimGraph_AnimNodes2_SampleBlendSpace2DAnimNode);
