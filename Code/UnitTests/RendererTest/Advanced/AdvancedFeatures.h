@@ -20,12 +20,15 @@ private:
     ST_Compute,
     ST_FloatSampling, // Either natively or emulated sampling of floating point textures e.g. depth textures.
     ST_ProxyTexture,
+    ST_Material
   };
 
   enum ImageCaptureFrames
   {
     DefaultCapture = 5,
-
+    Material_ColorChange = 6,
+    Material_ColorChange2 = 7,
+    Material_ChangeTexture = 8
   };
 
   virtual void SetupSubTests() override;
@@ -40,6 +43,7 @@ private:
   void VertexShaderRenderTargetArrayIndex();
   void Tessellation();
   void Compute();
+  ezTestAppRun Material();
   ezTestAppRun SharedTexture();
   void OffscreenProcessMessageFunc(const ezProcessMessage* pMsg);
 
@@ -61,6 +65,14 @@ private:
 
   // Tessellation Test
   ezMeshBufferResourceHandle m_hSphereMesh;
+
+  // Material Test
+  ezTexture2DResourceHandle m_hTexture;
+  ezTexture2DResourceHandle m_hTexture2;
+  ezMaterialResourceHandle m_hMaterial;
+  ezHashedString m_sBaseColor;
+  ezHashedString m_sBaseColor2;
+  ezHashedString m_sTexture;
 
   // Shared Texture Test
 #if EZ_ENABLED(EZ_SUPPORTS_PROCESSES)

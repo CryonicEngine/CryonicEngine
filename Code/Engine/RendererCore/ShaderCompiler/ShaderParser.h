@@ -1,7 +1,9 @@
 #pragma once
 
+#include <Foundation/Types/Status.h>
 #include <RendererCore/Shader/ShaderHelper.h>
 #include <RendererCore/ShaderCompiler/Declarations.h>
+#include <RendererFoundation/Device/DeviceCapabilities.h>
 #include <RendererFoundation/Shader/ShaderByteCode.h>
 
 class ezPropertyAttribute;
@@ -39,13 +41,12 @@ public:
 
   static ezResult PreprocessSection(ezStreamReader& inout_stream, ezShaderHelper::ezShaderSections::Enum section, ezArrayPtr<ezString> customDefines, ezStringBuilder& out_sResult);
 
-  static void ParseMaterialParameterSection(
-    ezStreamReader& inout_stream, ezDynamicArray<ParameterDefinition>& out_parameter, ezDynamicArray<EnumDefinition>& out_enumDefinitions);
+  static void ParseMaterialParameterSection(ezStreamReader& inout_stream, ezDynamicArray<ParameterDefinition>& out_parameter, ezDynamicArray<EnumDefinition>& out_enumDefinitions);
 
-  static void ParsePermutationSection(
-    ezStreamReader& inout_stream, ezDynamicArray<ezHashedString>& out_permVars, ezDynamicArray<ezPermutationVar>& out_fixedPermVars);
-  static void ParsePermutationSection(
-    ezStringView sPermutationSection, ezDynamicArray<ezHashedString>& out_permVars, ezDynamicArray<ezPermutationVar>& out_fixedPermVars);
+  static void ParsePermutationSection(ezStringView sPermutationSection, ezDynamicArray<ezHashedString>& out_permVars, ezDynamicArray<ezPermutationVar>& out_fixedPermVars);
+
+  static ezStatus ParseMaterialConstantsSection(ezStringView sMaterialConstantsSection, ezSharedPtr<ezShaderConstantBufferLayout>& out_pMaterialConstantBufferLayout);
+  static void LayoutMaterialConstants(ezShaderConstantBufferLayout& ref_materialConstantBufferLayout, ezEnum<ezGALBufferLayout> layout);
 
   static void ParsePermutationVarConfig(ezStringView sPermutationVarConfig, ezVariant& out_defaultValue, EnumDefinition& out_enumDefinition);
 
