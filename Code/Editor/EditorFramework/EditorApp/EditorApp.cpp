@@ -368,6 +368,43 @@ ezStatus ezQtEditorApp::MakeRemoteProjectLocal(ezStringBuilder& inout_sFilePath)
 
     QProcess proc;
     proc.setWorkingDirectory(sTargetDir.GetData());
+    proc.setProcessChannelMode(QProcess::MergedChannels);
+
+    ezProgressRange progress("Downloading Project", true);
+    bool bRecursion = false;
+
+    QObject::connect(&proc, &QProcess::readyReadStandardOutput, [&]()
+      {
+        if (bRecursion)
+          return;
+
+        bRecursion = true;
+
+        auto data = proc.readAllStandardOutput();
+        ezStringBuilder str = data.toStdString().c_str();
+        if (const char* szPercent = str.FindLastSubString("%"))
+        {
+          str.SetSubString_FromTo(szPercent - 3, szPercent);
+          str.Trim();
+
+          ezInt32 p;
+          if (ezConversionUtils::StringToInt(str, p).Succeeded())
+          {
+            progress.SetCompletion(p / 100.0f);
+          }
+        }
+
+        if (progress.WasCanceled())
+        {
+          proc.close();
+        }
+
+        bRecursion = false;
+        //
+      });
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS_DESKTOP)
     proc.start("git.exe", args);
 #else
@@ -380,6 +417,7 @@ ezStatus ezQtEditorApp::MakeRemoteProjectLocal(ezStringBuilder& inout_sFilePath)
     }
 
     proc.waitForFinished(60 * 1000);
+    QApplication::restoreOverrideCursor();
 
     if (proc.exitStatus() != QProcess::ExitStatus::NormalExit)
     {
