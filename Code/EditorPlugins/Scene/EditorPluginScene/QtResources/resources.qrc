@@ -116,6 +116,7 @@
     <file>ezResetTransformComponent.svg</file>
     <file>ezRandomPrefabComponent.svg</file>
     <file>ezScriptComponent.svg</file>
+    <file>ezThirdPersonViewComponent.svg</file>
   </qresource>
   <qresource prefix="GroupIcons">
     <file>Size.svg</file>

@@ -23,7 +23,6 @@ ezFakeRopeComponent;Fake Rope Simulation;;https://ezengine.net/pages/docs/effect
 ezFogComponent;Fog;;https://ezengine.net/pages/docs/effects/fog.html
 ezGrabbableItemComponent;Grabbable Item;;https://ezengine.net/pages/docs/gameplay/grabbable-item-component.html
 ezGreyBoxComponent;Grey Boxing;;https://ezengine.net/pages/docs/scenes/greyboxing.html
-ezHeadBoneComponent;Head Bone;;https://ezengine.net/pages/docs/gameplay/headbone-component.html
 ezHeightfieldComponent;Heightfield;;https://ezengine.net/pages/docs/terrain/heightfield-component.html
 ezInputComponent;Input;;https://ezengine.net/pages/docs/input/input-component.html
 ezInstancedMeshComponent;Instanced Mesh;;https://ezengine.net/pages/docs/graphics/meshes/instanced-mesh-component.html

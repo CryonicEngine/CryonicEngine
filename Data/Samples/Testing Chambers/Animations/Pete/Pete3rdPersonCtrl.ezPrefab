@@ -11,7 +11,7 @@ o
 		s %AssetType{"Prefab"}
 		VarArray %Dependencies{}
 		Uuid %DocumentID{u4{4063831808526479806,5002292852126062766}}
-		u4 %Hash{14973367728197093681}
+		u4 %Hash{5677804135592950555}
 		VarArray %MetaInfo
 		{
 			Uuid{u4{5302902712215008652,16789820488192224536}}
@@ -313,7 +313,7 @@ o
 			Uuid{u4{944873550417723582,5267620052761860568}}
 			Uuid{u4{10496548307671686328,5041412984996809039}}
 		}
-		s %GlobalKey{""}
+		s %GlobalKey{"Player"}
 		Vec3 %LocalPosition{f{0,0,0}}
 		Quat %LocalRotation{f{0,0,0,0x0000803F}}
 		Vec3 %LocalScaling{f{0x0000803F,0x0000803F,0x0000803F}}
@@ -370,14 +370,14 @@ o
 	p
 	{
 		b %Active{1}
-		f %CeilingHeight{0x00008040}
 		u1 %CollisionLayer{0}
-		f %FloorHeight{0}
-		f %MaxDistance{0x00004040}
+		f %MaxDistance{0x00008040}
+		f %MaxDistanceDown{0x00000040}
+		f %MaxDistanceUp{0x0000803F}
 		Angle %MaxUpRotation{f{0xC2B8B23F}}
 		f %MinDistance{0x0000803E}
 		Angle %MinUpRotation{f{0xAA619CBF}}
-		f %SweepWidth{0xCDCC4C3E}
+		f %SweepWidth{0xCDCCCC3E}
 		s %TargetObject{".."}
 		Vec3 %TargetOffsetHigh{f{0x0000003F,0x9A99993E,0x00000040}}
 		Vec3 %TargetOffsetLow{f{0x000000BF,0x9A99993E,0x00000040}}
@@ -1270,8 +1270,8 @@ o
 		s %Category{"ezPropertyCategory::Member"}
 		Invalid %ConstantValue{}
 		s %Flags{"ezPropertyFlags::StandardType|ezPropertyFlags::Phantom"}
-		s %Name{"MaxUpRotation"}
-		s %Type{"ezAngle"}
+		s %Name{"MaxDistanceDown"}
+		s %Type{"float"}
 	}
 }
 o
@@ -1561,7 +1561,10 @@ o
 	u3 %v{1}
 	p
 	{
-		VarArray %Attributes{}
+		VarArray %Attributes
+		{
+			Uuid{u4{7592774032074459616,18131139261979483052}}
+		}
 		s %Flags{"ezTypeFlags::Class|ezTypeFlags::Phantom"}
 		VarArray %Functions
 		{
@@ -1591,6 +1594,17 @@ o
 }
 o
 {
+	Uuid %id{u4{17080142902336615801,5738904882392100406}}
+	s %t{"ezClampValueAttribute"}
+	u3 %v{1}
+	p
+	{
+		Angle %Max{f{0xAA619C3F}}
+		Angle %Min{f{0x4EE4BDBF}}
+	}
+}
+o
+{
 	Uuid %id{u4{2409342147495339198,5865720642441041269}}
 	s %t{"ezReflectedPropertyDescriptor"}
 	u3 %v{2}
@@ -1606,6 +1620,17 @@ o
 		s %Flags{"ezPropertyFlags::StandardType|ezPropertyFlags::Phantom"}
 		s %Name{"JumpImpulse"}
 		s %Type{"float"}
+	}
+}
+o
+{
+	Uuid %id{u4{11344827904418057729,5912438800854598353}}
+	s %t{"ezClampValueAttribute"}
+	u3 %v{1}
+	p
+	{
+		Angle %Max{f{0x4EE4BD3F}}
+		Angle %Min{f{0xAA619CBF}}
 	}
 }
 o
@@ -1681,12 +1706,13 @@ o
 		VarArray %Attributes
 		{
 			Uuid{u4{12248299040557914723,13563708707711310355}}
+			Uuid{u4{11344827904418057729,5912438800854598353}}
 		}
 		s %Category{"ezPropertyCategory::Member"}
 		Invalid %ConstantValue{}
 		s %Flags{"ezPropertyFlags::StandardType|ezPropertyFlags::Phantom"}
-		s %Name{"FloorHeight"}
-		s %Type{"float"}
+		s %Name{"MaxUpRotation"}
+		s %Type{"ezAngle"}
 	}
 }
 o
@@ -1715,7 +1741,7 @@ o
 	u3 %v{1}
 	p
 	{
-		f %Value{0xCDCC4C3E}
+		f %Value{0xCDCCCC3E}
 	}
 }
 o
@@ -1825,8 +1851,8 @@ o
 	u3 %v{1}
 	p
 	{
-		Angle %Max{f{0xAA619C3F}}
-		Angle %Min{f{0x4EE4BDBF}}
+		f %Max{0x0000C842}
+		f %Min{0x0000003F}
 	}
 }
 o
@@ -2075,8 +2101,8 @@ o
 	u3 %v{1}
 	p
 	{
-		Angle %Max{f{0x4EE4BD3F}}
-		Angle %Min{f{0xAA619CBF}}
+		f %Max{0x0000C842}
+		f %Min{0x0000003F}
 	}
 }
 o
@@ -2391,8 +2417,8 @@ o
 		s %Category{"ezPropertyCategory::Member"}
 		Invalid %ConstantValue{}
 		s %Flags{"ezPropertyFlags::StandardType|ezPropertyFlags::Phantom"}
-		s %Name{"MinUpRotation"}
-		s %Type{"ezAngle"}
+		s %Name{"MaxDistanceUp"}
+		s %Type{"float"}
 	}
 }
 o
@@ -2405,12 +2431,13 @@ o
 		VarArray %Attributes
 		{
 			Uuid{u4{18041772660815097177,13265794929582138390}}
+			Uuid{u4{17080142902336615801,5738904882392100406}}
 		}
 		s %Category{"ezPropertyCategory::Member"}
 		Invalid %ConstantValue{}
 		s %Flags{"ezPropertyFlags::StandardType|ezPropertyFlags::Phantom"}
-		s %Name{"CeilingHeight"}
-		s %Type{"float"}
+		s %Name{"MinUpRotation"}
+		s %Type{"ezAngle"}
 	}
 }
 o
@@ -2813,7 +2840,7 @@ o
 	u3 %v{1}
 	p
 	{
-		f %Value{0x00008040}
+		Angle %Value{f{0xAA619CBF}}
 	}
 }
 o
@@ -2853,7 +2880,7 @@ o
 	u3 %v{1}
 	p
 	{
-		f %Value{0}
+		Angle %Value{f{0xC2B8B23F}}
 	}
 }
 o
@@ -2897,7 +2924,7 @@ o
 	u3 %v{1}
 	p
 	{
-		Angle %Value{f{0xAA619CBF}}
+		f %Value{0x00004040}
 	}
 }
 o
@@ -3288,7 +3315,7 @@ o
 	u3 %v{1}
 	p
 	{
-		Angle %Value{f{0xC2B8B23F}}
+		f %Value{0x0000803F}
 	}
 }
 o
@@ -3404,6 +3431,16 @@ o
 	p
 	{
 		Angle %Value{f{0xDB0FC93F}}
+	}
+}
+o
+{
+	Uuid %id{u4{7592774032074459616,18131139261979483052}}
+	s %t{"ezCategoryAttribute"}
+	u3 %v{1}
+	p
+	{
+		s %Category{"Gameplay"}
 	}
 }
 o

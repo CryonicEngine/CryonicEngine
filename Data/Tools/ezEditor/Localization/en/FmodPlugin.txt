@@ -5,8 +5,8 @@ Sound Event;FMOD Sound Event
 
 # Component Types
 
-ezFmodEventComponent;FMOD Sound Event;;https://ezengine.net/pages/docs/sound/fmod-event-component.html
-ezFmodListenerComponent;FMOD Listener;;https://ezengine.net/pages/docs/sound/fmod-listener-component.html
+ezFmodEventComponent;FMOD Sound Event;;https://ezengine.net/pages/docs/sound/fmod/fmod-event-component.html
+ezFmodListenerComponent;FMOD Listener;;https://ezengine.net/pages/docs/sound/fmod/fmod-listener-component.html
 
 # UI
 
