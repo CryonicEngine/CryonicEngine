@@ -71,7 +71,6 @@ Document.Close;Close
 Document.CloseAll;Close All
 Document.CloseAllButThis;Close All But This
 Document.OpenContainingFolder;Open in Explorer
-Document.CopyAssetGuid;Copy Asset Guid;Stores the assets GUID in the clipboard.
 Document.MoveWindow;Move to Container Window
 Document.NewWindow;New Container Window
 Document.Undo;Undo
@@ -81,6 +80,7 @@ Document.Redo;Redo
 
 Help.CheckForUpdates;Check for Updates...
 Help.ReportProblem;Report a Problem...
+Help.AskQuestion;Ask a Question...
 
 # Assets
 
@@ -90,6 +90,8 @@ Asset.TransformAll;Transform All Assets;Transform All: Runs asset transformation
 Asset.ResaveAll;Resave All Assets;Opens every document and saves it. Used to get all documents to the latest version.
 Asset.CheckFilesystem;Check Filesystem;Checks for new or deleted assets on disk
 Asset.WriteLookupTable;Write Lookup Table
+Asset.Help;Open Asset Documentation;Open online documentation for this asset type
+Asset.CopyAssetGuid;Copy Asset Guid;Stores the assets GUID in the clipboard.
 
 # Prefabs
 

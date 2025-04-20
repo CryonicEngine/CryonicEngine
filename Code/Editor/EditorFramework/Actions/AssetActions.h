@@ -15,10 +15,11 @@ public:
 
   static ezActionDescriptorHandle s_hAssetCategory;
   static ezActionDescriptorHandle s_hTransformAsset;
+  static ezActionDescriptorHandle s_hAssetHelp;
   static ezActionDescriptorHandle s_hTransformAllAssets;
   static ezActionDescriptorHandle s_hCheckFileSystem;
-  static ezActionDescriptorHandle s_hWriteLookupTable;
   static ezActionDescriptorHandle s_hWriteDependencyDGML;
+  static ezActionDescriptorHandle s_hCopyAssetGuid;
 };
 
 ///
@@ -30,10 +31,11 @@ public:
   enum class ButtonType
   {
     TransformAsset,
+    AssetHelp,
     TransformAllAssets,
     CheckFileSystem,
-    WriteLookupTable,
     WriteDependencyDGML,
+    CopyAssetGuid,
   };
 
   ezAssetAction(const ezActionContext& context, const char* szName, ButtonType button);
