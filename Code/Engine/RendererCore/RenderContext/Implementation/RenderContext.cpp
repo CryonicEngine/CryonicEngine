@@ -1071,8 +1071,8 @@ ezResult ezRenderContext::BuildVertexDeclaration(ezGALShaderHandle hShader, ezAr
   {
     iHighestUsedBinding = ezMath::Max(iHighestUsedBinding, static_cast<ezInt32>(customVertexDecl.m_VertexStreams[slot].m_uiVertexBufferSlot));
   }
-  EZ_ASSERT_DEBUG(iHighestUsedBinding < vertexBufferStrides.GetCount(), "Not enough vertex buffer strides");
-  EZ_ASSERT_DEBUG(iHighestUsedBinding < vertexBufferBindingRates.GetCount(), "Not enough vertex buffer binding rates");
+  EZ_ASSERT_DEBUG(iHighestUsedBinding < (ezInt32)vertexBufferStrides.GetCount(), "Not enough vertex buffer strides");
+  EZ_ASSERT_DEBUG(iHighestUsedBinding < (ezInt32)vertexBufferBindingRates.GetCount(), "Not enough vertex buffer binding rates");
 
   ShaderVertexDecl svd;
   {
