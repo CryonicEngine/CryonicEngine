@@ -490,12 +490,17 @@ void ezSceneAction::LaunchPlayer(const char* szPlayerApp)
 {
   ezStringBuilder sCmd;
   QStringList arguments = GetPlayerCommandLine(sCmd);
-
   ezLog::Info("Running: {} {}", szPlayerApp, sCmd);
   m_pSceneDocument->ShowDocumentStatus(ezFmt("Running: {} {}", szPlayerApp, sCmd));
 
-  QProcess proc;
-  proc.startDetached(QString::fromUtf8(szPlayerApp), arguments);
+  ezStringBuilder sPlayerApp = szPlayerApp;
+#if EZ_ENABLED(EZ_PLATFORM_LINUX)
+  if (sPlayerApp.IsRelativePath())
+  {
+    sPlayerApp.Prepend("./");
+  }
+#endif()
+  QProcess::startDetached(QString::fromUtf8(sPlayerApp.GetData()), arguments, QCoreApplication::applicationDirPath());
 }
 
 QStringList ezSceneAction::GetPlayerCommandLine(ezStringBuilder& out_sSingleLine) const
