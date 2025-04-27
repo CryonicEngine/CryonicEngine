@@ -166,23 +166,7 @@ void ezRenderContext::BeginRendering(const ezGALRenderingSetup& renderingSetup, 
 {
   EZ_ASSERT_DEBUG(m_bRendering == false && m_bCompute == false, "Already in a scope");
   m_bRendering = true;
-  ezGALMSAASampleCount::Enum msaaSampleCount = ezGALMSAASampleCount::None;
-
-  ezGALRenderTargetViewHandle hRTV;
-  if (renderingSetup.m_RenderTargetSetup.GetRenderTargetCount() > 0)
-  {
-    hRTV = renderingSetup.m_RenderTargetSetup.GetRenderTarget(0);
-  }
-  if (hRTV.IsInvalidated())
-  {
-    hRTV = renderingSetup.m_RenderTargetSetup.GetDepthStencilTarget();
-  }
-
-  if (const ezGALRenderTargetView* pRTV = ezGALDevice::GetDefaultDevice()->GetRenderTargetView(hRTV))
-  {
-    msaaSampleCount = pRTV->GetTexture()->GetDescription().m_SampleCount;
-  }
-
+  const ezGALMSAASampleCount::Enum msaaSampleCount = renderingSetup.GetRenderPass().m_Msaa;
   if (msaaSampleCount != ezGALMSAASampleCount::None)
   {
     SetShaderPermutationVariable("MSAA", "TRUE");

@@ -1,6 +1,7 @@
 #include <Foundation/FoundationPCH.h>
 
 #include <Foundation/Math/Rational.h>
+#include <Foundation/Math/Size.h>
 #include <Foundation/Strings/FormatString.h>
 #include <Foundation/Strings/HashedString.h>
 #include <Foundation/Strings/String.h>
@@ -380,6 +381,17 @@ ezStringView BuildString(char* szTmp, ezUInt32 uiLength, const ezArgSensitive& a
 
   return arg.m_sSensitiveInfo;
 }
+
+ezStringView BuildString(char* szTmp, ezUInt32 uiLength, const ezSizeU32& arg)
+{
+  ezUInt32 writepos = 0;
+  ezStringUtils::OutputFormattedInt(szTmp, uiLength, writepos, arg.width, 1, false, 10);
+  szTmp[writepos++] = 'x';
+  ezStringUtils::OutputFormattedInt(szTmp, uiLength, writepos, arg.height, 1, false, 10);
+  szTmp[writepos] = '\0';
+  return ezStringView(szTmp, szTmp + writepos);
+}
+
 
 ezStringView ezArgSensitive::BuildString_SensitiveUserData_Hash(char* szTmp, ezUInt32 uiLength, const ezArgSensitive& arg)
 {
