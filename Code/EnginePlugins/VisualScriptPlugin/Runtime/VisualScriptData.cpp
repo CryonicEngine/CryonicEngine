@@ -481,8 +481,15 @@ ezVariant ezVisualScriptDataStorage::GetDataAsVariant(DataOffset dataOffset, con
       EZ_ASSERT_NOT_IMPLEMENTED;
 
     case ezVisualScriptDataType::Component:
-      EZ_ASSERT_DEBUG(pExpectedType == ezGetStaticRTTI<ezComponentHandle>(), "");
-      return GetData<ezComponentHandle>(dataOffset);
+      if (pExpectedType == nullptr || pExpectedType->IsDerivedFrom<ezComponent>())
+      {
+        return GetPointerData(dataOffset, uiExecutionCounter);
+      }
+      else if (pExpectedType == ezGetStaticRTTI<ezComponentHandle>())
+      {
+        return GetData<ezComponentHandle>(dataOffset);
+      }
+      EZ_ASSERT_NOT_IMPLEMENTED;
 
     case ezVisualScriptDataType::TypedPointer:
       return GetPointerData(dataOffset, uiExecutionCounter);
