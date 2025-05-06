@@ -658,19 +658,20 @@ void ezStandardInputDevice::WindowMessage(ezMinWindows::HWND hWnd, ezMinWindows:
         // if at all, we should handle them as touch points, not as mouse positions
         if ((raw->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE) == 0)
         {
-          RECT area;
-          GetClientRect(ezMinWindows::ToNative(hWnd), &area);
-          const float fInvResX = 1.0f / (area.right - area.left);
-          const float fInvResY = 1.0f / (area.bottom - area.top);
+          const float fMouseScale = 1.0f / 10.0f;
 
+          // values are reported by the mouse and are resolution independent
+          // however, they can be extremely sensitive especially on high DPI mice
+          // so we scale the value down by a constant factor, so that they are closer to what we get in other implementations
+          // were we have to use absolute mouse coordinate differences
           m_InputSlotValues[ezInputSlot_MouseMoveNegX] +=
-            ((raw->data.mouse.lLastX < 0) ? (float)-raw->data.mouse.lLastX : 0.0f) * GetMouseSpeed().x * fInvResX;
+            ((raw->data.mouse.lLastX < 0) ? (float)-raw->data.mouse.lLastX : 0.0f) * GetMouseSpeed().x * fMouseScale;
           m_InputSlotValues[ezInputSlot_MouseMovePosX] +=
-            ((raw->data.mouse.lLastX > 0) ? (float)raw->data.mouse.lLastX : 0.0f) * GetMouseSpeed().x * fInvResX;
+            ((raw->data.mouse.lLastX > 0) ? (float)raw->data.mouse.lLastX : 0.0f) * GetMouseSpeed().x * fMouseScale;
           m_InputSlotValues[ezInputSlot_MouseMoveNegY] +=
-            ((raw->data.mouse.lLastY < 0) ? (float)-raw->data.mouse.lLastY : 0.0f) * GetMouseSpeed().y * fInvResY;
+            ((raw->data.mouse.lLastY < 0) ? (float)-raw->data.mouse.lLastY : 0.0f) * GetMouseSpeed().y * fMouseScale;
           m_InputSlotValues[ezInputSlot_MouseMovePosY] +=
-            ((raw->data.mouse.lLastY > 0) ? (float)raw->data.mouse.lLastY : 0.0f) * GetMouseSpeed().y * fInvResY;
+            ((raw->data.mouse.lLastY > 0) ? (float)raw->data.mouse.lLastY : 0.0f) * GetMouseSpeed().y * fMouseScale;
 
 // Mouse input does not always work via WM_INPUT
 // e.g. some VMs don't send mouse click input via WM_INPUT when the mouse cursor is visible
@@ -698,11 +699,12 @@ void ezStandardInputDevice::WindowMessage(ezMinWindows::HWND hWnd, ezMinWindows:
             // if this flag is set, we are getting mouse input through a remote desktop session
             // and that means we will not get any relative mouse move events, so we need to emulate them
 
-            static const ezInt32 iVirtualDesktopW = 1; // GetSystemMetrics(SM_CXVIRTUALSCREEN);
-            static const ezInt32 iVirtualDesktopH = 1; // GetSystemMetrics(SM_CYVIRTUALSCREEN);
+            static const ezInt32 iVirtualDesktopW = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            static const ezInt32 iVirtualDesktopH = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
             static ezVec2 vLastPos(ezMath::MaxValue<float>());
-            const ezVec2 vNewPos((raw->data.mouse.lLastX / 65535.0f) * iVirtualDesktopW, (raw->data.mouse.lLastY / 65535.0f) * iVirtualDesktopH);
+            const ezVec2 vNewPos(
+              (raw->data.mouse.lLastX / 65535.0f) * iVirtualDesktopW, (raw->data.mouse.lLastY / 65535.0f) * iVirtualDesktopH);
 
             if (vLastPos.x != ezMath::MaxValue<float>())
             {
