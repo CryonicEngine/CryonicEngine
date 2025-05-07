@@ -9,6 +9,10 @@
 
 #include <stdarg.h>
 
+#if TRACY_ENABLE
+#  include <tracy/tracy/Tracy.hpp>
+#endif
+
 // Comment in to log into ezLog::Print any message that is output while no logger is registered.
 // #define DEBUG_STARTUP_LOGGING
 
@@ -227,6 +231,36 @@ void ezLog::BroadcastLoggingEvent(ezLogInterface* pInterface, ezLogMsgType::Enum
       szTag[0] = '\0';
     }
   }
+
+#if TRACY_ENABLE
+  switch (type)
+  {
+    case ezLogMsgType::ErrorMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::Red);
+      break;
+    case ezLogMsgType::SeriousWarningMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::Orange);
+      break;
+    case ezLogMsgType::WarningMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::Yellow);
+      break;
+    case ezLogMsgType::SuccessMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::Green);
+      break;
+    case ezLogMsgType::InfoMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::White);
+      break;
+    case ezLogMsgType::DevMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::Grey);
+      break;
+    case ezLogMsgType::DebugMsg:
+      TracyMessageC(sString.GetStartPointer(), sString.GetElementCount(), tracy::Color::CornflowerBlue);
+      break;
+
+    default:
+      break;
+  }
+#endif
 
   ezLoggingEventData le;
   le.m_EventType = type;
