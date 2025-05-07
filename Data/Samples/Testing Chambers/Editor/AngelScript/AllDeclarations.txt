@@ -22,9 +22,6 @@ bool ezBoxReflectionProbeComponent::get_BoxProjection() const
 bool ezCVar::GetBoolValue(ezStringView Name)
 bool ezCVar::GetValue_asBool(ezStringView Name)
 bool ezCameraComponent::get_ShowStats() const
-bool ezCharacterControllerComponent::IsCrouching()
-bool ezCharacterControllerComponent::IsDestinationUnobstructed(ezVec3 globalFootPosition, float characterHeight)
-bool ezCharacterControllerComponent::IsTouchingGround()
 bool ezClock::GetPaused() const
 bool ezCollectionComponent::get_RegisterNames() const
 bool ezColor::IsEqualRGB(const ezColor&in, float fEpsilon) const
@@ -452,7 +449,6 @@ ezCameraUsageHint::MainView
 ezCameraUsageHint::None
 ezCameraUsageHint::RenderTarget
 ezCameraUsageHint::Thumbnail
-ezCharacterControllerComponent@ ezComponent::opCast()
 ezClock@ ezClock::GetGlobalClock()
 ezClock@ ezWorld::GetClock()
 ezClothSheetComponent@ ezComponent::opCast()
@@ -683,7 +679,6 @@ ezComponent@ ezCameraComponent::opImplCast()
 ezComponent@ ezCameraShakeComponent::opImplCast()
 ezComponent@ ezCameraShakeVolumeComponent::opImplCast()
 ezComponent@ ezCameraShakeVolumeSphereComponent::opImplCast()
-ezComponent@ ezCharacterControllerComponent::opImplCast()
 ezComponent@ ezClothSheetComponent::opImplCast()
 ezComponent@ ezCollectionComponent::opImplCast()
 ezComponent@ ezColorAnimationComponent::opImplCast()
@@ -2339,8 +2334,6 @@ void ezCameraShakeVolumeComponent::set_BurstDuration(ezTime)
 void ezCameraShakeVolumeComponent::set_OnFinishedAction(ezOnComponentFinishedAction)
 void ezCameraShakeVolumeComponent::set_Strength(float)
 void ezCameraShakeVolumeSphereComponent::set_Radius(float)
-void ezCharacterControllerComponent::RawMove(ezVec3 moveDeltaGlobal)
-void ezCharacterControllerComponent::TeleportCharacter(ezVec3 globalFootPosition)
 void ezClock::SetPaused(bool)
 void ezClock::SetSpeed(double)
 void ezClothSheetComponent::set_Color(ezColor)
@@ -2578,6 +2571,11 @@ void ezJoltConeConstraintComponent::set_ConeAngle(ezAngle)
 void ezJoltConstraintComponent::set_BreakForce(float)
 void ezJoltConstraintComponent::set_BreakTorque(float)
 void ezJoltConstraintComponent::set_PairCollision(bool)
+void ezJoltDefaultCharacterComponent::Crouch()
+void ezJoltDefaultCharacterComponent::Jump()
+void ezJoltDefaultCharacterComponent::Move(float Forward, float Right)
+void ezJoltDefaultCharacterComponent::RotateZ(float Amount)
+void ezJoltDefaultCharacterComponent::Run()
 void ezJoltDefaultCharacterComponent::TeleportCharacter(ezVec3 globalFootPosition)
 void ezJoltDefaultCharacterComponent::set_AirFriction(float)
 void ezJoltDefaultCharacterComponent::set_AirSpeed(float)

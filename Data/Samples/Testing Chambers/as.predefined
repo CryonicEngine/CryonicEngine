@@ -1214,7 +1214,6 @@ class ezComponent
   ezSpawnComponent@ opCast();
   ezTimedDeathComponent@ opCast();
   ezTriggerDelayModifierComponent@ opCast();
-  ezCharacterControllerComponent@ opCast();
   ezStateMachineComponent@ opCast();
   ezVolumeComponent@ opCast();
   ezVolumeSphereComponent@ opCast();
@@ -2191,15 +2190,6 @@ class ezTriggerDelayModifierComponent : ezComponent
   ezTime DeactivationDelay;
 }
 
-class ezCharacterControllerComponent : ezComponent
-{
-  void RawMove(ezVec3 moveDeltaGlobal);
-  void TeleportCharacter(ezVec3 globalFootPosition);
-  bool IsDestinationUnobstructed(ezVec3 globalFootPosition, float characterHeight);
-  bool IsTouchingGround();
-  bool IsCrouching();
-}
-
 class ezStateMachineComponent : ezComponent
 {
   bool SetState(ezStringView Name);
@@ -2564,6 +2554,11 @@ class ezJoltDefaultCharacterComponent : ezJoltCharacterControllerComponent
   bool IsSlidingOnGround() const;
   bool IsInAir() const;
   bool IsCrouching() const;
+  void Jump();
+  void Run();
+  void Crouch();
+  void RotateZ(float Amount);
+  void Move(float Forward, float Right);
   float ShapeRadius;
   float CrouchHeight;
   float StandHeight;

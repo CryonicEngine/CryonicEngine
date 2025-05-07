@@ -3,8 +3,11 @@
 #if EZ_ENABLED(EZ_PLATFORM_WINDOWS_DESKTOP)
 
 #  include <GuiFoundation/UIServices/UIServices.moc.h>
+#  include <ToolsFoundation/Application/ApplicationServices.h>
+#  include <ToolsFoundation/Project/ToolsProject.h>
 
 #  include <ShlObj_core.h>
+#include <Foundation/IO/OSFile.h>
 
 void ezQtUiServices::OpenInExplorer(const char* szPath, bool bIsFile)
 {
@@ -35,6 +38,15 @@ void ezQtUiServices::OpenWith(const char* szPath)
 ezStatus ezQtUiServices::OpenInVsCode(const QStringList& arguments)
 {
   QString sVsCodeExe;
+
+  {
+    ezStringBuilder sDstDir = ezToolsProject::GetSingleton()->GetProjectDirectory();
+    sDstDir.AppendPath(".vscode");
+
+    ezStringBuilder sSrcDir = ezApplicationServices::GetSingleton()->GetApplicationDataFolder();
+    sSrcDir.AppendPath("VSC");
+    ezOSFile::CopyFolder(sSrcDir, sDstDir).IgnoreResult();
+  }
 
   sVsCodeExe = QStandardPaths::locate(QStandardPaths::GenericDataLocation, "Programs/Microsoft VS Code/Code.exe", QStandardPaths::LocateOption::LocateFile);
 

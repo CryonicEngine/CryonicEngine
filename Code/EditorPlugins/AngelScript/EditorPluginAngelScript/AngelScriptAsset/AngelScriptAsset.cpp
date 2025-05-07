@@ -268,7 +268,6 @@ void ezAngelScriptAssetDocument::OpenExternalEditor()
     QStringList args;
 
     args.append(ezMakeQString(ezToolsProject::GetSingleton()->GetProjectDirectory()));
-
     args.append(sScriptFileAbs.GetData());
 
     if (ezQtUiServices::OpenInVsCode(args).Failed())

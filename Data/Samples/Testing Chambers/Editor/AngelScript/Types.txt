@@ -25,7 +25,6 @@ ezCameraShakeComponent
 ezCameraShakeVolumeComponent
 ezCameraShakeVolumeSphereComponent
 ezCameraUsageHint
-ezCharacterControllerComponent
 ezClock
 ezClothSheetComponent
 ezClothSheetFlags
