@@ -1336,10 +1336,8 @@ namespace
     }
 
     ezComponent* pComponent = nullptr;
-    if (static_cast<ezGameObject*>(p.m_pObject)->TryGetComponentOfBaseType(userData.m_pType, pComponent))
-    {
-      inout_context.SetPointerData(node.GetOutputDataOffset(0), pComponent);
-    }
+    bool _ = static_cast<ezGameObject*>(p.m_pObject)->TryGetComponentOfBaseType(userData.m_pType, pComponent);
+    inout_context.SetPointerData(node.GetOutputDataOffset(0), pComponent);
 
     return ExecResult::RunNext(0);
   }
