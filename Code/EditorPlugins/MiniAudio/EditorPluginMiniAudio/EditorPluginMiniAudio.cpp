@@ -33,6 +33,7 @@ void OnLoadPlugin()
     // Menu Bar
     {
       ezMiniAudioActions::RegisterActions();
+      ezMiniAudioActions::MapPluginMenuActions("AssetMenuBar");
       ezMiniAudioActions::MapMenuActions("EditorPluginScene_DocumentMenuBar");
       ezMiniAudioActions::MapMenuActions("EditorPluginScene_Scene2MenuBar");
       ezMiniAudioActions::MapToolbarActions("EditorPluginScene_DocumentToolBar");

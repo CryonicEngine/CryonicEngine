@@ -27,9 +27,6 @@ bool ezBoxReflectionProbeComponent::get_BoxProjection() const
 bool ezCVar::GetBoolValue(ezStringView Name)
 bool ezCVar::GetValue_asBool(ezStringView Name)
 bool ezCameraComponent::get_ShowStats() const
-bool ezCharacterControllerComponent::IsCrouching()
-bool ezCharacterControllerComponent::IsDestinationUnobstructed(ezVec3 globalFootPosition, float characterHeight)
-bool ezCharacterControllerComponent::IsTouchingGround()
 bool ezClock::GetPaused() const
 bool ezCollectionComponent::get_RegisterNames() const
 bool ezColor::IsEqualRGB(const ezColor&in, float fEpsilon) const
@@ -87,7 +84,6 @@ bool ezGameObjectHandle::IsInvalidated() const
 bool ezGameObjectHandle::opEquals(ezGameObjectHandle) const
 bool ezGrabbableItemComponent::get_DebugShowPoints() const
 bool ezGreyBoxComponent::get_GenerateCollision() const
-bool ezGreyBoxComponent::get_IncludeInNavmesh() const
 bool ezGreyBoxComponent::get_SlopedBottom() const
 bool ezGreyBoxComponent::get_SlopedTop() const
 bool ezGreyBoxComponent::get_UseAsOccluder() const
@@ -135,6 +131,7 @@ bool ezPhysics::Raycast(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObje
 bool ezPhysics::RaycastSurfaceInteraction(ezVec3 RayStart, ezVec3 RayDirection, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes, ezStringView FallbackSurface, ezTempHashedString Interaction, float Impulse = 0, uint IgnoreObjectID = 4294967295)
 bool ezPhysics::SweepTestCapsule(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, float Height, ezTransform Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
 bool ezPhysics::SweepTestSphere(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, ezVec3 Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
+bool ezPrefabReferenceComponent::get_ShowShapeIcons() const
 bool ezPropertyAnimComponent::get_Playing() const
 bool ezQuat::IsEqualRotation(const ezQuat&in, float fEpsilon = 0.00001) const
 bool ezQuat::IsNaN() const
@@ -151,6 +148,7 @@ bool ezResetTransformComponent::get_ResetScaling() const
 bool ezRopeRenderComponent::get_Subdivide() const
 bool ezSceneTransitionComponent::get_RelativeSpawnPosition() const
 bool ezScriptComponent::GetScriptVariable_asBool(ezHashedString Name) const
+bool ezScriptComponent::get_UpdateOnlyWhenSimulating() const
 bool ezSensorComponent::get_ShowDebugInfo() const
 bool ezSensorComponent::get_TestVisibility() const
 bool ezSimpleAnimationComponent::get_EnableIK() const
@@ -221,7 +219,7 @@ bool ezStringView::StartsWith(ezStringView) const
 bool ezStringView::StartsWith_NoCase(ezStringView) const
 bool ezStringView::TrimWordEnd(ezStringView sWord)
 bool ezStringView::TrimWordStart(ezStringView sWord)
-bool ezStringView::opEquals(ezStringView) const
+bool ezStringView::opEquals(const ezStringView&in) const
 bool ezTempHashedString::IsEmpty() const
 bool ezTempHashedString::opEquals(ezTempHashedString) const
 bool ezTime::IsNegative() const
@@ -388,7 +386,6 @@ ezCameraUsageHint::MainView
 ezCameraUsageHint::None
 ezCameraUsageHint::RenderTarget
 ezCameraUsageHint::Thumbnail
-ezCharacterControllerComponent@ ezComponent::opCast()
 ezClock@ ezClock::GetGlobalClock()
 ezClock@ ezWorld::GetClock()
 ezCollectionComponent@ ezComponent::opCast()
@@ -602,7 +599,6 @@ ezComponent@ ezBeamComponent::opImplCast()
 ezComponent@ ezBlackboardComponent::opImplCast()
 ezComponent@ ezBoxReflectionProbeComponent::opImplCast()
 ezComponent@ ezCameraComponent::opImplCast()
-ezComponent@ ezCharacterControllerComponent::opImplCast()
 ezComponent@ ezCollectionComponent::opImplCast()
 ezComponent@ ezColorAnimationComponent::opImplCast()
 ezComponent@ ezCommentComponent::opImplCast()
@@ -754,6 +750,7 @@ ezGameObject@ ezGameObject::FindChildByPath(ezStringView sPath)
 ezGameObject@ ezGameObject::GetParent()
 ezGameObject@ ezGameObject::GetParent() const
 ezGameObject@ ezSpatial::FindClosestObjectInSphere(ezStringView Category, ezVec3 Center, float Radius)
+ezGameObject@ ezWorld::SearchForObject(ezStringView sSearchPath, ezGameObject@ pStartSearchObj = null, const ezRTTI@ pExpectedComponent = null)
 ezGameObjectHandle ezBlackboardComponent::GetEntryValue_asGameObjectHandle(ezString Name) const
 ezGameObjectHandle ezCVar::GetValue_asGameObjectHandle(ezStringView Name)
 ezGameObjectHandle ezGameObject::GetHandle() const
@@ -856,6 +853,7 @@ ezMessage@ ezMsgComponentsChanged::opImplCast()
 ezMessage@ ezMsgDamage::opImplCast()
 ezMessage@ ezMsgDeleteGameObject::opImplCast()
 ezMessage@ ezMsgDeliverAngelScriptMsg::opImplCast()
+ezMessage@ ezMsgExport::opImplCast()
 ezMessage@ ezMsgExtractGeometry::opImplCast()
 ezMessage@ ezMsgExtractOccluderData::opImplCast()
 ezMessage@ ezMsgExtractRenderData::opImplCast()
@@ -903,6 +901,7 @@ ezMsgDamage@ ezEventMessage::opCast()
 ezMsgDamage@ ezMessage::opCast()
 ezMsgDeleteGameObject@ ezMessage::opCast()
 ezMsgDeliverAngelScriptMsg@ ezMessage::opCast()
+ezMsgExport@ ezMessage::opCast()
 ezMsgExtractGeometry@ ezMessage::opCast()
 ezMsgExtractOccluderData@ ezMessage::opCast()
 ezMsgExtractRenderData@ ezMessage::opCast()
@@ -1141,6 +1140,8 @@ ezString ezLocalBlackboardComponent::get_BlackboardName() const
 ezString ezMarkerComponent::get_Marker() const
 ezString ezMsgBlackboardEntryChanged::get_Name() const
 ezString ezMsgDamage::get_HitObjectName() const
+ezString ezMsgExport::get_DocumentGuid() const
+ezString ezMsgExport::get_DocumentType() const
 ezString ezMsgInputActionTriggered::get_InputAction() const
 ezString ezMsgSetFloatParameter::get_Name() const
 ezString ezMsgStateMachineStateChanged::get_NewStateName() const
@@ -1704,7 +1705,7 @@ int ezStringView::Compare(ezStringView) const
 int ezStringView::CompareN(ezStringView, uint) const
 int ezStringView::CompareN_NoCase(ezStringView, uint) const
 int ezStringView::Compare_NoCase(ezStringView) const
-int ezStringView::opCmp(ezStringView) const
+int ezStringView::opCmp(const ezStringView&in) const
 int ezTime::opCmp(const ezTime&in) const
 int ezVec2::opCmp(const ezVec2&in) const
 int ezVec3::opCmp(const ezVec3&in) const
@@ -1817,8 +1818,6 @@ void ezCameraComponent::set_RenderTargetSize(ezVec2)
 void ezCameraComponent::set_ShowStats(bool)
 void ezCameraComponent::set_ShutterTime(ezTime)
 void ezCameraComponent::set_UsageHint(ezCameraUsageHint)
-void ezCharacterControllerComponent::RawMove(ezVec3 moveDeltaGlobal)
-void ezCharacterControllerComponent::TeleportCharacter(ezVec3 globalFootPosition)
 void ezClock::SetPaused(bool)
 void ezClock::SetSpeed(double)
 void ezCollectionComponent::set_Collection(ezStringView)
@@ -1845,6 +1844,7 @@ void ezColorAnimationComponent::set_RandomStartOffset(bool)
 void ezColorAnimationComponent::set_SetColorMode(ezSetColorMode)
 void ezColorGammaUB::opAssign(const ezColor&in)
 void ezComponent::Deinitialize()
+void ezComponent::DeleteComponent()
 void ezComponent::Initialize()
 void ezComponent::OnActivated()
 void ezComponent::OnDeactivated()
@@ -1907,11 +1907,13 @@ void ezFillLightComponent::set_LightMode(ezFillLightMode)
 void ezFillLightComponent::set_Range(float)
 void ezFillLightComponent::set_Temperature(uint)
 void ezFillLightComponent::set_UseColorTemperature(bool)
-void ezFmodEventComponent::Restart()
+void ezFmodEventComponent::FadeOut()
+void ezFmodEventComponent::Pause()
+void ezFmodEventComponent::Play()
 void ezFmodEventComponent::SetEventParameter(ezString ParamName, float Value)
 void ezFmodEventComponent::SoundCue()
 void ezFmodEventComponent::StartOneShot()
-void ezFmodEventComponent::StopSound(bool Immediate)
+void ezFmodEventComponent::Stop()
 void ezFmodEventComponent::set_NoGlobalPitch(bool)
 void ezFmodEventComponent::set_OcclusionCollisionLayer(uint8)
 void ezFmodEventComponent::set_OcclusionThreshold(float)
@@ -1953,8 +1955,10 @@ void ezGameObject::SetGlobalKey(const ezHashedString&in sKey)
 void ezGameObject::SetGlobalKey(ezStringView sKey)
 void ezGameObject::SetGlobalPosition(const ezVec3&in)
 void ezGameObject::SetGlobalRotation(const ezQuat&in)
+void ezGameObject::SetGlobalRotationToLookAt(const ezVec3&in vTargetPosition, const ezVec3&in vUp = ezVec3(0, 0, 1))
 void ezGameObject::SetGlobalScaling(const ezVec3&in)
 void ezGameObject::SetGlobalTransform(const ezTransform&in)
+void ezGameObject::SetGlobalTransformToLookAt(const ezVec3&in vOwnPosition, const ezVec3&in vTargetPosition, const ezVec3&in vUp = ezVec3(0, 0, 1))
 void ezGameObject::SetLocalPosition(const ezVec3&in)
 void ezGameObject::SetLocalRotation(const ezQuat&in)
 void ezGameObject::SetLocalScaling(const ezVec3&in)
@@ -1976,7 +1980,6 @@ void ezGreyBoxComponent::set_Curvature(ezAngle)
 void ezGreyBoxComponent::set_CustomData(ezVec4)
 void ezGreyBoxComponent::set_Detail(uint)
 void ezGreyBoxComponent::set_GenerateCollision(bool)
-void ezGreyBoxComponent::set_IncludeInNavmesh(bool)
 void ezGreyBoxComponent::set_Material(ezStringView)
 void ezGreyBoxComponent::set_Shape(ezGreyBoxShape)
 void ezGreyBoxComponent::set_SizeNegX(float)
@@ -2079,6 +2082,8 @@ void ezMsgDamage::set_Damage(double)
 void ezMsgDamage::set_GlobalPosition(ezVec3)
 void ezMsgDamage::set_HitObjectName(ezString)
 void ezMsgDamage::set_ImpactDirection(ezVec3)
+void ezMsgExport::set_DocumentGuid(ezString)
+void ezMsgExport::set_DocumentType(ezString)
 void ezMsgGenericEvent::set_Message(ezHashedString)
 void ezMsgInputActionTriggered::set_KeyPressValue(float)
 void ezMsgInputActionTriggered::set_TriggerState(ezTriggerState)
@@ -2138,6 +2143,7 @@ void ezPlayerStartPointComponent::set_PlayerPrefab(ezStringView)
 void ezPointLightComponent::set_Range(float)
 void ezPointLightComponent::set_ShadowFadeOutRange(float)
 void ezPrefabReferenceComponent::set_Prefab(ezStringView)
+void ezPrefabReferenceComponent::set_ShowShapeIcons(bool)
 void ezPrefabs::SpawnPrefab(ezStringView Prefab, ezTransform GlobalTransform, ezVec3 RelativePos, ezQuat RelativeRotation)
 void ezPrefabs::SpawnPrefabAsChild(ezStringView Prefab, ezGameObject@ Parent, ezVec3 RelativePos, ezQuat RelativeRotation)
 void ezPropertyAnimComponent::PlayAnimationRange(ezTime RangeLow, ezTime RangeHigh)
@@ -2193,9 +2199,9 @@ void ezSceneTransitionComponent::set_SpawnPoint(ezHashedString)
 void ezSceneTransitionComponent::set_TargetScene(ezHashedString)
 void ezScriptComponent::BroadcastEventMsg(const ezEventMessage&in msg)
 void ezScriptComponent::SetScriptVariable(ezHashedString Name, ?&in Value)
-void ezScriptComponent::SetUpdateInterval(ezTime interval)
 void ezScriptComponent::set_ScriptClass(ezStringView)
 void ezScriptComponent::set_UpdateInterval(ezTime)
+void ezScriptComponent::set_UpdateOnlyWhenSimulating(bool)
 void ezSensorComponent::set_CollisionLayer(uint8)
 void ezSensorComponent::set_Color(ezColorGammaUB)
 void ezSensorComponent::set_ShowDebugInfo(bool)
@@ -2243,7 +2249,7 @@ void ezSliderComponent::set_Axis(ezBasisAxis)
 void ezSliderComponent::set_Deceleration(float)
 void ezSliderComponent::set_Distance(float)
 void ezSliderComponent::set_RandomStart(ezTime)
-void ezSound::PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation, float Pitch = 1, float Volume = 1, bool BlockToLoad = 1)
+void ezSound::PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation = 1, float Pitch = 1, float Volume = 1, bool BlockToLoad = false)
 void ezSpatial::FindObjectsInSphere(ezStringView sCategory, const ezVec3&in vCenter, float fRadius, ReportObjectCB@ callback)
 void ezSpawnBoxComponent::StartSpawning()
 void ezSpawnBoxComponent::set_Duration(ezTime)

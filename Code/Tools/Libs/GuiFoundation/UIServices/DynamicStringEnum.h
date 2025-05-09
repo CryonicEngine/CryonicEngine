@@ -18,6 +18,9 @@ public:
   /// Calls s_RequestUnknownCallback, if the requested enum is not known yet, which will try to load the data.
   static ezDynamicStringEnum& GetDynamicEnum(ezStringView sEnumName);
 
+  /// \brief Always (re-) creates the ezDynamicEnum under the requested name.
+  ///
+  /// Use this when you intend to reset the values and don't want them to be loaded from file.
   static ezDynamicStringEnum& CreateDynamicEnum(ezStringView sEnumName);
 
   /// \brief Removes the entire enum with the given name.

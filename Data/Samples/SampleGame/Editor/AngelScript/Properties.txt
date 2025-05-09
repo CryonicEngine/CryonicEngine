@@ -97,6 +97,8 @@ DimGrey
 Dimensions
 Directionality
 Distance
+DocumentGuid
+DocumentType
 DodgerBlue
 Duration
 EditBones
@@ -151,7 +153,6 @@ ISO
 IgnoreOwnerRotation
 ImpactDirection
 Impulse
-IncludeInNavmesh
 IndianRed
 Indigo
 InfluenceScale
@@ -360,6 +361,7 @@ ShowDebugInfo
 ShowDebugOverlay
 ShowDebugProbes
 ShowMipMaps
+ShowShapeIcons
 ShowStats
 ShutterTime
 Sienna
@@ -433,6 +435,7 @@ UScale
 UVUnitsPerWorldUnit
 UpVector
 UpdateInterval
+UpdateOnlyWhenSimulating
 UpdateRate
 UsageHint
 UseAsOccluder

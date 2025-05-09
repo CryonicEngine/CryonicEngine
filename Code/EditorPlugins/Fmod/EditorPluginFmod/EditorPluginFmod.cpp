@@ -31,6 +31,7 @@ void OnLoadPlugin()
     // Menu Bar
     {
       ezFmodActions::RegisterActions();
+      ezFmodActions::MapPluginMenuActions("AssetMenuBar");
       ezFmodActions::MapMenuActions("EditorPluginScene_DocumentMenuBar");
       ezFmodActions::MapMenuActions("EditorPluginScene_Scene2MenuBar");
       ezFmodActions::MapToolbarActions("EditorPluginScene_DocumentToolBar");

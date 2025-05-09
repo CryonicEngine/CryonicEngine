@@ -32,13 +32,19 @@ void ezFmodActions::UnregisterActions()
   ezActionManager::UnregisterAction(s_hMasterVolume);
 }
 
-void ezFmodActions::MapMenuActions(ezStringView sMapping)
+void ezFmodActions::MapPluginMenuActions(ezStringView sMapping)
 {
   ezActionMap* pMap = ezActionMapManager::GetActionMap(sMapping);
   EZ_ASSERT_DEV(pMap != nullptr, "Mapping the actions failed!");
 
   pMap->MapAction(s_hCategoryFmod, "G.Plugins.Settings", 9.0f);
   pMap->MapAction(s_hProjectSettings, "G.Plugins.Settings", "FMOD", 0.0f);
+}
+
+void ezFmodActions::MapMenuActions(ezStringView sMapping)
+{
+  ezActionMap* pMap = ezActionMapManager::GetActionMap(sMapping);
+  EZ_ASSERT_DEV(pMap != nullptr, "Mapping the actions failed!");
 
   pMap->MapAction(s_hCategoryFmod, "G.Scene", 5.0f);
   pMap->MapAction(s_hMuteSound, "G.Scene", "FMOD", 0.0f);

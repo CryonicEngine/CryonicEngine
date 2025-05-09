@@ -28,12 +28,19 @@ void ezMiniAudioActions::UnregisterActions()
   ezActionManager::UnregisterAction(s_hVolume);
 }
 
+void ezMiniAudioActions::MapPluginMenuActions(ezStringView sMapping)
+{
+  // ezActionMap* pMap = ezActionMapManager::GetActionMap(sMapping);
+  // EZ_ASSERT_DEV(pMap != nullptr, "Mapping the actions failed!");
+  //  pMap->MapAction(s_hCategoryMiniAudio, "G.Plugins.Settings", 9.0f);
+
+  // no plugin specific menu entries at the moment
+}
+
 void ezMiniAudioActions::MapMenuActions(ezStringView sMapping)
 {
   ezActionMap* pMap = ezActionMapManager::GetActionMap(sMapping);
   EZ_ASSERT_DEV(pMap != nullptr, "Mapping the actions failed!");
-
-  pMap->MapAction(s_hCategoryMiniAudio, "G.Plugins.Settings", 9.0f);
 
   pMap->MapAction(s_hCategoryMiniAudio, "G.Scene", 5.0f);
   pMap->MapAction(s_hMute, "G.Scene", "MiniAudio", 0.0f);

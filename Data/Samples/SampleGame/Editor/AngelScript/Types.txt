@@ -22,7 +22,6 @@ ezBoxReflectionProbeComponent
 ezCameraComponent
 ezCameraMode
 ezCameraUsageHint
-ezCharacterControllerComponent
 ezClock
 ezCollectionComponent
 ezColor
@@ -91,6 +90,7 @@ ezMsgComponentsChanged
 ezMsgDamage
 ezMsgDeleteGameObject
 ezMsgDeliverAngelScriptMsg
+ezMsgExport
 ezMsgExtractGeometry
 ezMsgExtractOccluderData
 ezMsgExtractRenderData

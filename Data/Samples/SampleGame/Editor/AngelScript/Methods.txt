@@ -35,6 +35,7 @@ CreateComponent
 CreateObject
 CrossRH
 Deinitialize
+DeleteComponent
 DeleteObjectDelayed
 DetachChild
 Dot
@@ -46,6 +47,7 @@ DoubleZeroToOneInclusive
 EndsWith
 EndsWith_NoCase
 ExpandAndGetRef
+FadeOut
 FindChildByName
 FindChildByPath
 FireTransitionEvent
@@ -193,8 +195,6 @@ IsAbsolutePath
 IsActive
 IsActiveAndInitialized
 IsActiveAndSimulating
-IsCrouching
-IsDestinationUnobstructed
 IsDirectionForwards
 IsDynamic
 IsEffectActive
@@ -219,7 +219,6 @@ IsPositive
 IsRelativePath
 IsRootedPath
 IsStatic
-IsTouchingGround
 IsValid
 IsValidComponent
 IsValidObject
@@ -237,7 +236,9 @@ OnActivated
 OnDeactivated
 OnSimulationStarted
 PathParentDirectory
+Pause
 PeekBack
+Play
 PlayAnimationRange
 PopBack
 PostEventMessage
@@ -246,7 +247,6 @@ PostMessageRecursive
 Prepend
 PrependFormat
 PushBack
-RawMove
 ReconstructFromMat3
 ReconstructFromMat4
 RemoveAtAndCopy
@@ -254,12 +254,12 @@ RemoveFileExtension
 ReplaceAll
 ReplaceAll_NoCase
 Reserve
-Restart
 Reverse
 Rotate
 ScaleRGB
 ScaleRGBA
 ScheduleSpawn
+SearchForObject
 SendEventMessage
 SendMessage
 SendMessageRecursive
@@ -273,8 +273,10 @@ SetFormat
 SetGlobalKey
 SetGlobalPosition
 SetGlobalRotation
+SetGlobalRotationToLookAt
 SetGlobalScaling
 SetGlobalTransform
+SetGlobalTransformToLookAt
 SetIdentity
 SetLocalPosition
 SetLocalRotation
@@ -293,7 +295,6 @@ SetSpeed
 SetStableRandomSeed
 SetState
 SetTeamID
-SetUpdateInterval
 SetValue
 SetZero
 Shrink
@@ -307,9 +308,8 @@ StartTransition
 StartTransitionWithOffsetTo
 StartsWith
 StartsWith_NoCase
+Stop
 StopEffect
-StopSound
-TeleportCharacter
 ToLinearFloat
 ToLower
 ToUpper

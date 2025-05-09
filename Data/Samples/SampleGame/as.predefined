@@ -739,8 +739,8 @@ class ezStringView
   void ChopAwayFirstCharacterAscii();
   bool TrimWordStart(ezStringView sWord);
   bool TrimWordEnd(ezStringView sWord);
-  bool opEquals(ezStringView) const;
-  int opCmp(ezStringView) const;
+  bool opEquals(const ezStringView&in) const;
+  int opCmp(const ezStringView&in) const;
   void opAssign(const ezString&in);
   void opAssign(const ezHashedString&in);
   void opAssign(const ezStringBuilder&in);
@@ -843,7 +843,9 @@ class ezStringBuilder
 {
   ezStringBuilder();
   ezStringBuilder(const ezStringView s1);
-  ezStringBuilder(const ezStringView s1, const ezStringView s2, const ezStringView s3 = "", const ezStringView s4 = "");
+  ezStringBuilder(const ezStringView&in, const ezStringView&in);
+  ezStringBuilder(const ezStringView&in, const ezStringView&in, const ezStringView&in);
+  ezStringBuilder(const ezStringView&in, const ezStringView&in, const ezStringView&in, const ezStringView&in);
 
   bool StartsWith(ezStringView) const;
   bool StartsWith_NoCase(ezStringView) const;
@@ -977,6 +979,8 @@ class ezGameObject
   ezVec3 GetGlobalDirForwards() const;
   ezVec3 GetGlobalDirRight() const;
   ezVec3 GetGlobalDirUp() const;
+  void SetGlobalRotationToLookAt(const ezVec3&in vTargetPosition, const ezVec3&in vUp = ezVec3(0, 0, 1));
+  void SetGlobalTransformToLookAt(const ezVec3&in vOwnPosition, const ezVec3&in vTargetPosition, const ezVec3&in vUp = ezVec3(0, 0, 1));
   ezVec3 GetLinearVelocity() const;
   ezVec3 GetAngularVelocity() const;
   void UpdateGlobalTransform();
@@ -1017,6 +1021,7 @@ class ezComponent
   ezGameObject@ GetOwner() const;
   ezWorld@ GetWorld() const;
   uint GetUniqueID() const;
+  void DeleteComponent();
   void Initialize();
   void Deinitialize();
   void OnActivated();
@@ -1103,7 +1108,6 @@ class ezComponent
   ezSpawnComponent@ opCast();
   ezTimedDeathComponent@ opCast();
   ezTriggerDelayModifierComponent@ opCast();
-  ezCharacterControllerComponent@ opCast();
   ezStateMachineComponent@ opCast();
   ezVolumeComponent@ opCast();
   ezVolumeSphereComponent@ opCast();
@@ -1141,6 +1145,7 @@ class ezWorld
   bool TryGetObject(const ezGameObjectHandle&in, const ezGameObject@&out pObject) const;
   bool TryGetObjectWithGlobalKey(const ezTempHashedString&in sGlobalKey, ezGameObject@&out pObject);
   bool TryGetObjectWithGlobalKey(const ezTempHashedString&in sGlobalKey, const ezGameObject@&out pObject);
+  ezGameObject@ SearchForObject(ezStringView sSearchPath, ezGameObject@ pStartSearchObj = null, const ezRTTI@ pExpectedComponent = null);
   bool IsValidComponent(ezComponentHandle&in);
   bool TryGetComponent(const ezComponentHandle&in hComponent, ?&out component);
   void SendMessage(const ezGameObjectHandle&in hReceiverObject, ezMessage&inout msg);
@@ -1200,6 +1205,7 @@ class ezMessage
   ezMsgBlackboardEntryChanged@ opCast();
   ezMsgInputActionTriggered@ opCast();
   ezMsgDamage@ opCast();
+  ezMsgExport@ opCast();
   ezMsgMoveCharacterController@ opCast();
   ezMsgStateMachineStateChanged@ opCast();
   ezMsgDeliverAngelScriptMsg@ opCast();
@@ -1275,6 +1281,7 @@ class ezForwardEventsToGameStateComponent : ezEventMessageHandlerComponent
 class ezPrefabReferenceComponent : ezComponent
 {
   ezStringView Prefab;
+  bool ShowShapeIcons;
 }
 
 class ezScriptComponent : ezEventMessageHandlerComponent
@@ -1293,8 +1300,8 @@ class ezScriptComponent : ezEventMessageHandlerComponent
   ezString GetScriptVariable_asString(ezHashedString Name) const;
   ezGameObjectHandle GetScriptVariable_asGameObjectHandle(ezHashedString Name) const;
   ezComponentHandle GetScriptVariable_asComponentHandle(ezHashedString Name) const;
-  void SetUpdateInterval(ezTime interval);
   ezTime UpdateInterval;
+  bool UpdateOnlyWhenSimulating;
   ezStringView ScriptClass;
   void BroadcastEventMsg(const ezEventMessage&in msg);
 }
@@ -1937,7 +1944,6 @@ class ezGreyBoxComponent : ezRenderComponent
   bool SlopedTop;
   bool SlopedBottom;
   bool GenerateCollision;
-  bool IncludeInNavmesh;
   bool UseAsOccluder;
 }
 
@@ -2012,15 +2018,6 @@ class ezTriggerDelayModifierComponent : ezComponent
 {
   ezTime ActivationDelay;
   ezTime DeactivationDelay;
-}
-
-class ezCharacterControllerComponent : ezComponent
-{
-  void RawMove(ezVec3 moveDeltaGlobal);
-  void TeleportCharacter(ezVec3 globalFootPosition);
-  bool IsDestinationUnobstructed(ezVec3 globalFootPosition, float characterHeight);
-  bool IsTouchingGround();
-  bool IsCrouching();
 }
 
 class ezStateMachineComponent : ezComponent
@@ -2102,9 +2099,11 @@ class ezFmodComponent : ezComponent
 
 class ezFmodEventComponent : ezFmodComponent
 {
-  void Restart();
+  void Play();
+  void Pause();
+  void Stop();
+  void FadeOut();
   void StartOneShot();
-  void StopSound(bool Immediate);
   void SoundCue();
   void SetEventParameter(ezString ParamName, float Value);
   bool Paused;
@@ -2388,6 +2387,12 @@ class ezMsgDamage : ezEventMessage
   ezVec3 ImpactDirection;
 }
 
+class ezMsgExport : ezMessage
+{
+  ezString DocumentType;
+  ezString DocumentGuid;
+}
+
 class ezMsgMoveCharacterController : ezMessage
 {
   double MoveForwards;
@@ -2597,7 +2602,7 @@ namespace ezClock
 
 namespace ezSound
 {
-  void PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation, float Pitch = 1, float Volume = 1, bool BlockToLoad = 1);
+  void PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation = 1, float Pitch = 1, float Volume = 1, bool BlockToLoad = false);
 }
 
 namespace ezCVar
