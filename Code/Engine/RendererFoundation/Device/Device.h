@@ -5,6 +5,7 @@
 #include <Foundation/Containers/IdTable.h>
 #include <Foundation/Memory/CommonAllocators.h>
 #include <Foundation/Strings/HashedString.h>
+#include <RendererFoundation/CommandEncoder/CommandEncoderState.h>
 #include <RendererFoundation/Descriptors/Descriptors.h>
 #include <RendererFoundation/Device/DeviceCapabilities.h>
 #include <RendererFoundation/Device/ReadbackLock.h>
@@ -468,6 +469,16 @@ private:
   ezHybridArray<ezGALSwapChain*, 8> m_FrameSwapChains;
   bool m_bBeginPipelineCalled = false;
   ezGALCommandEncoder* m_pCommandEncoder = nullptr;
+
+  ezUInt32 m_uiShaders = 0;
+  ezUInt32 m_uiVertexDeclarations = 0;
+  ezUInt32 m_uiBlendStates = 0;
+  ezUInt32 m_uiDepthStencilStates = 0;
+  ezUInt32 m_uiRasterizerStates = 0;
+  ezUInt32 m_uiGraphicsPipelines = 0;
+  ezUInt32 m_uiComputePipelines = 0;
+  ezUInt32 m_uiSamplerStates = 0;
+  ezGALCommandEncoderStats m_EncoderStats;
 };
 
 #include <RendererFoundation/Device/Implementation/Device_inl.h>
