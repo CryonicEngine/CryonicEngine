@@ -5,6 +5,7 @@
 #include <Foundation/IO/OpenDdlReader.h>
 #include <Foundation/IO/OpenDdlUtils.h>
 #include <Foundation/IO/OpenDdlWriter.h>
+#include <RendererCore/RenderWorld/RenderWorld.h>
 #include <RmlUiPlugin/Implementation/EventListener.h>
 #include <RmlUiPlugin/Implementation/FileInterface.h>
 #include <RmlUiPlugin/Implementation/RenderInterface.h>
@@ -88,7 +89,10 @@ struct ezRmlUi::Data
   ezRmlUiInternal::ContextInstancer m_ContextInstancer;
   ezRmlUiInternal::EventListenerInstancer m_EventListenerInstancer;
 
+  ezMutex m_ContextsMutex;
   ezDynamicArray<ezRmlUiContext*> m_Contexts;
+
+  ezUInt64 m_uiLastClearedCacheFrame = 0;
 
   ezRmlUiConfiguration m_Config;
 };
@@ -132,6 +136,8 @@ ezRmlUi::~ezRmlUi()
 
 ezRmlUiContext* ezRmlUi::CreateContext(const char* szName, const ezVec2U32& vInitialSize)
 {
+  EZ_LOCK(m_pData->m_ContextsMutex);
+
   ezRmlUiContext* pContext = static_cast<ezRmlUiContext*>(Rml::CreateContext(szName, Rml::Vector2i(vInitialSize.x, vInitialSize.y)));
 
   m_pData->m_Contexts.PushBack(pContext);
@@ -141,6 +147,8 @@ ezRmlUiContext* ezRmlUi::CreateContext(const char* szName, const ezVec2U32& vIni
 
 void ezRmlUi::DeleteContext(ezRmlUiContext* pContext)
 {
+  EZ_LOCK(m_pData->m_ContextsMutex);
+
   m_pData->m_Contexts.RemoveAndCopy(pContext);
 
   Rml::RemoveContext(pContext->GetName());
@@ -148,6 +156,8 @@ void ezRmlUi::DeleteContext(ezRmlUiContext* pContext)
 
 bool ezRmlUi::AnyContextWantsInput()
 {
+  EZ_LOCK(m_pData->m_ContextsMutex);
+
   for (auto pContext : m_pData->m_Contexts)
   {
     if (pContext->WantsInput())
@@ -155,6 +165,66 @@ bool ezRmlUi::AnyContextWantsInput()
   }
 
   return false;
+}
+
+ezResult ezRmlUi::LoadDocumentFromResource(ezRmlUiContext& ref_context, const ezRmlUiResourceHandle& hResource)
+{
+  UnloadDocument(ref_context);
+
+  if (hResource.IsValid())
+  {
+    ezResourceLock<ezRmlUiResource> pResource(hResource, ezResourceAcquireMode::BlockTillLoaded);
+    if (pResource.GetAcquireResult() == ezResourceAcquireResult::Final)
+    {
+      // RmlUi is not thread safe, so we need to make that we only load/unload one document at a time.
+      EZ_LOCK(m_pData->m_ContextsMutex);
+
+      ref_context.LoadDocument(pResource->GetRmlFile().GetData());
+    }
+  }
+
+  return ref_context.HasDocument() ? EZ_SUCCESS : EZ_FAILURE;
+}
+
+ezResult ezRmlUi::LoadDocumentFromString(ezRmlUiContext& ref_context, const ezStringView& sContent)
+{
+  UnloadDocument(ref_context);
+
+  if (!sContent.IsEmpty())
+  {
+    Rml::String sRmlContent = Rml::String(sContent.GetStartPointer(), sContent.GetElementCount());
+
+    // RmlUi is not thread safe, so we need to make that we only load/unload one document at a time.
+    EZ_LOCK(m_pData->m_ContextsMutex);
+
+    ref_context.LoadDocumentFromMemory(sRmlContent);
+  }
+
+  return ref_context.HasDocument() ? EZ_SUCCESS : EZ_FAILURE;
+}
+
+void ezRmlUi::UnloadDocument(ezRmlUiContext& ref_context)
+{
+  if (ref_context.HasDocument())
+  {
+    // RmlUi is not thread safe, so we need to make that we only load/unload one document at a time.
+    EZ_LOCK(m_pData->m_ContextsMutex);
+
+    static_cast<Rml::Context&>(ref_context).UnloadDocument(ref_context.GetDocument(0));
+  }
+}
+
+void ezRmlUi::ClearCaches()
+{
+  ezUInt64 uiCurrentFrame = ezRenderWorld::GetFrameCounter();
+  if (uiCurrentFrame == m_pData->m_uiLastClearedCacheFrame)
+    return;
+
+  m_pData->m_uiLastClearedCacheFrame = uiCurrentFrame;
+
+  EZ_LOCK(m_pData->m_ContextsMutex);
+  Rml::Factory::ClearStyleSheetCache();
+  Rml::Factory::ClearTemplateCache();
 }
 
 void ezRmlUi::ExtractContext(ezRmlUiContext& ref_context, ezGALTextureHandle hTexture)

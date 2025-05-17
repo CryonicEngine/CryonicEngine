@@ -36,6 +36,13 @@ public:
 
   bool AnyContextWantsInput();
 
+  ezResult LoadDocumentFromResource(ezRmlUiContext& ref_context, const ezRmlUiResourceHandle& hResource);
+  ezResult LoadDocumentFromString(ezRmlUiContext& ref_context, const ezStringView& sContent);
+
+  void UnloadDocument(ezRmlUiContext& ref_context);
+
+  void ClearCaches();
+
   void ExtractContext(ezRmlUiContext& ref_context, ezGALTextureHandle hTexture);
 
 private:
