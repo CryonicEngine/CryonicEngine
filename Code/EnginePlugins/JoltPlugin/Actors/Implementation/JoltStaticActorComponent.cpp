@@ -112,6 +112,7 @@ void ezJoltStaticActorComponent::OnSimulationStarted()
   bodyCfg.mFriction = pMaterial->m_fFriction;
   bodyCfg.mCollisionGroup.SetGroupID(m_uiObjectFilterID);
   bodyCfg.mCollisionGroup.SetGroupFilter(pModule->GetGroupFilter());
+  bodyCfg.mEnhancedInternalEdgeRemoval = true;
   bodyCfg.mUserData = reinterpret_cast<ezUInt64>(pUserData);
 
   JPH::Body* pBody = pBodies->CreateBody(bodyCfg);
