@@ -618,6 +618,7 @@ void ezJoltWorldModule::StartSimulation(const ezWorldModule::UpdateContext& cont
     pTriggerManager->UpdateMovingTriggers();
   }
 
+  ApplyImpulses();
   UpdateConstraints();
 
   m_SimulateTaskGroupId = ezTaskSystem::StartSingleTask(m_pSimulateTask, ezTaskPriority::EarlyThisFrame);
@@ -1088,6 +1089,51 @@ void ezJoltWorldModule::DebugDrawGeometry(const ezVec3& vCenter, float fRadius, 
     pMesh->SetBounds(shapeGeo.m_Bounds);
     pMesh->SetMaterialFile(vis.m_szMaterial);
     pMesh->SetColor(vis.m_Color);
+  }
+}
+
+void ezJoltWorldModule::AddImpulse(ezUInt32 uiBodyID, const ezVec3& vImpulse, const ezVec3& vGlobalPosition)
+{
+  EZ_LOCK(m_ImpulsesMutex);
+  auto& imp = m_Impulses.ExpandAndGetRef();
+  imp.m_uiBodyID = uiBodyID;
+  imp.m_vImpulse = vImpulse;
+  imp.m_vGlobalPosition = vGlobalPosition;
+}
+
+void ezJoltWorldModule::ApplyImpulses()
+{
+  if (m_Impulses.IsEmpty())
+    return;
+
+  auto* pBodies = &m_pSystem->GetBodyInterface();
+  ezHybridArray<ezJoltImpulse, 64> retain;
+
+  EZ_LOCK(m_ImpulsesMutex);
+
+  for (ezUInt32 i = 0; i < m_Impulses.GetCount(); ++i)
+  {
+    auto& imp = m_Impulses[i];
+
+    const JPH::BodyID bodyId(imp.m_uiBodyID);
+
+    if (bodyId.IsInvalid())
+      continue;
+
+    if (!pBodies->IsAdded(bodyId))
+    {
+      retain.PushBack(imp);
+      continue;
+    }
+
+    pBodies->AddImpulse(bodyId, ezJoltConversionUtils::ToVec3(imp.m_vImpulse), ezJoltConversionUtils::ToVec3(imp.m_vGlobalPosition));
+  }
+
+  m_Impulses.Clear();
+
+  for (auto& imp : retain)
+  {
+    m_Impulses.PushBack(imp);
   }
 }
 
