@@ -2,6 +2,7 @@ class ScriptObject :  ezAngelScriptClass
 {
     private float capHealth = 5;
     private float bodyHealth = 50;
+    private uint32 capForce = 0;
 
     void OnSimulationStarted()
     {
@@ -16,17 +17,19 @@ class ScriptObject :  ezAngelScriptClass
             auto owner = GetOwner();
             auto cap = owner.FindChildByName("Cap");
 
-            ezMsgPhysicsAddForce forceMsg;
-            forceMsg.GlobalPosition = cap.GetGlobalPosition();
-            forceMsg.Force = cap.GetGlobalDirUp();
+            ezJoltDynamicActorComponent@ actor;
+            if (owner.TryGetComponentOfBaseType(@actor))
+            {
+                ezVec3 force = cap.GetGlobalDirUp();
 
-            auto randomDir = ezVec3::MakeRandomDirection(GetWorld().GetRandomNumberGenerator());
-            randomDir *= 0.4;
+                auto randomDir = ezVec3::MakeRandomDirection(GetWorld().GetRandomNumberGenerator());
+                randomDir *= 0.4;
+    
+                force += randomDir;
+                force *= -2;
 
-            forceMsg.Force += randomDir;
-            forceMsg.Force *= -400;
-
-            owner.SendMessage(forceMsg);
+                actor.AddOrUpdateForce(capForce, ezTime::Seconds(0.5f), force);
+            }
         }
     }
 

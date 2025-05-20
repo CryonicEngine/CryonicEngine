@@ -335,6 +335,9 @@ ezTransformStatus ezSkeletonAssetDocument::InternalTransformAsset(ezStreamWriter
       if (pImporter->Import(opt).Failed())
         return ezStatus("Model importer was unable to read this asset.");
 
+      if (newSkeleton.m_Children.IsEmpty())
+        return ezStatus("Imported skeleton is empty.");
+
       range.BeginNextStep("Importing Skeleton Data");
 
       // synchronize the old data (collision geometry etc.) with the new hierarchy

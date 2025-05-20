@@ -14,7 +14,7 @@ o
 			s{"Assets/BreakableCube.glb"}
 		}
 		Uuid %DocumentID{u4{11467864308164704397,5180657745186677858}}
-		u4 %Hash{11738869680150850266}
+		u4 %Hash{4057654318881107337}
 		VarArray %MetaInfo{}
 		VarArray %Outputs{}
 		VarArray %PackageDeps
@@ -61,7 +61,9 @@ o
 			Uuid{u4{6414642945147856786,4904025972577524420}}
 		}
 		u1 %MaxSimplificationError{5}
+		s %MeshExcludeTags{""}
 		s %MeshFile{"Assets/BreakableCube.glb"}
+		s %MeshIncludeTags{""}
 		u1 %MeshSimplification{50}
 		s %NormalPrecision{"ezMeshNormalPrecision::_10Bit"}
 		b %NormalizeWeights{1}
@@ -69,6 +71,7 @@ o
 		b %RecalculateTangents{1}
 		b %SimplifyMesh{0}
 		s %TexCoordPrecision{"ezMeshTexCoordPrecision::_16Bit"}
+		s %VertexColorConversion{"ezMeshVertexColorConversion::None"}
 	}
 }
 o
@@ -170,6 +173,23 @@ o
 		s %PluginName{"Static"}
 		VarArray %Properties{}
 		s %TypeName{"ezMeshTexCoordPrecision"}
+		u3 %TypeVersion{1}
+	}
+}
+o
+{
+	Uuid %id{u4{1149684950174857976,12897203947091760514}}
+	s %t{"ezReflectedTypeDescriptor"}
+	u3 %v{1}
+	p
+	{
+		VarArray %Attributes{}
+		s %Flags{"ezTypeFlags::IsEnum|ezTypeFlags::Minimal"}
+		VarArray %Functions{}
+		s %ParentTypeName{"ezEnumBase"}
+		s %PluginName{"Static"}
+		VarArray %Properties{}
+		s %TypeName{"ezMeshVertexColorConversion"}
 		u3 %TypeVersion{1}
 	}
 }

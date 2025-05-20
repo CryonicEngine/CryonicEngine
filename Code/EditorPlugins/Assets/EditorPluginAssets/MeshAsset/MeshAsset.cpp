@@ -265,6 +265,17 @@ ezTransformStatus ezMeshAssetDocument::CreateMeshFromFile(ezMeshAssetProperties*
   if (pImporter->Import(opt).Failed())
     return ezStatus("Model importer was unable to read this asset.");
 
+  if (desc.GetSubMeshes().IsEmpty() || !desc.GetBounds().IsValid())
+    return ezStatus("Imported mesh is empty.");
+
+  for (auto& sm : desc.GetSubMeshes())
+  {
+    if (sm.m_uiPrimitiveCount == 0)
+    {
+      return ezStatus("Imported mesh is empty.");
+    }
+  }
+
   range.BeginNextStep("Importing Materials");
 
   // correct the number of material slots
