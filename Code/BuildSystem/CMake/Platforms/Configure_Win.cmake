@@ -138,9 +138,9 @@ macro(ez_platformhook_download_qt)
 		endif()
 
 		if((EZ_QT_DIR STREQUAL "EZ_QT_DIR-NOTFOUND") OR(EZ_QT_DIR STREQUAL ""))
-			ez_download_and_extract("${EZ_SDK_URL}" "${CMAKE_BINARY_DIR}" "${EZ_SDK_VERSION}")
+			ez_download_and_extract("${EZ_SDK_URL}" "${CMAKE_BINARY_DIR}/.." "${EZ_SDK_VERSION}")
 
-			set(EZ_QT_DIR "${CMAKE_BINARY_DIR}/${EZ_SDK_VERSION}" CACHE PATH "Directory of the Qt installation" FORCE)
+			set(EZ_QT_DIR "${CMAKE_BINARY_DIR}/../${EZ_SDK_VERSION}" CACHE PATH "Directory of the Qt installation" FORCE)
 		endif()
 	endif()
 
