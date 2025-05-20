@@ -394,8 +394,7 @@ namespace
   };
 
   template <typename Cluster>
-  void RasterizeSpotLight(const BoundingCone& spotLightCone, ezUInt32 uiLightIndex, const ezSimdMat4f& mViewMatrix,
-    const ezSimdMat4f& mProjectionMatrix, Cluster* pClusters, ezSimdBSphere* pClusterBoundingSpheres)
+  void RasterizeSpotLight(const BoundingCone& spotLightCone, ezUInt32 uiLightIndex, const ezSimdMat4f& mViewMatrix, const ezSimdMat4f& mProjectionMatrix, Cluster* pClusters, const ezSimdBSphere* pClusterBoundingSpheres)
   {
     ezSimdVec4f position = mViewMatrix.TransformPosition(spotLightCone.m_PositionAndRange);
     ezSimdFloat range = spotLightCone.m_PositionAndRange.w();
@@ -423,21 +422,23 @@ namespace
     const ezUInt32 uiBlockIndex = uiLightIndex / 32;
     const ezUInt32 uiMask = 1 << (uiLightIndex - uiBlockIndex * 32);
 
-    FillCluster(screenSpaceBounds, uiBlockIndex, uiMask, pClusters, [&](ezUInt32 uiClusterIndex)
+    FillCluster(screenSpaceBounds, uiBlockIndex, uiMask, pClusters,
+      [&](ezUInt32 uiClusterIndex)
       {
-      ezSimdBSphere clusterSphere = pClusterBoundingSpheres[uiClusterIndex];
-      ezSimdFloat clusterRadius = clusterSphere.GetRadius();
+        ezSimdBSphere clusterSphere = pClusterBoundingSpheres[uiClusterIndex];
+        ezSimdFloat clusterRadius = clusterSphere.GetRadius();
 
-      ezSimdVec4f toConePos = clusterSphere.m_CenterAndRadius - position;
-      ezSimdFloat projected = forwardDir.Dot<3>(toConePos);
-      ezSimdFloat distToConeSq = toConePos.Dot<3>(toConePos);
-      ezSimdFloat distClosestP = cosAngle * (distToConeSq - projected * projected).GetSqrt() - projected * sinAngle;
+        ezSimdVec4f toConePos = clusterSphere.m_CenterAndRadius - position;
+        ezSimdFloat projected = forwardDir.Dot<3>(toConePos);
+        ezSimdFloat distToConeSq = toConePos.Dot<3>(toConePos);
+        ezSimdFloat distClosestP = cosAngle * (distToConeSq - projected * projected).GetSqrt() - projected * sinAngle;
 
-      bool angleCull = distClosestP > clusterRadius;
-      bool frontCull = projected > clusterRadius + range;
-      bool backCull = projected < -clusterRadius;
+        bool angleCull = distClosestP > clusterRadius;
+        bool frontCull = projected > clusterRadius + range;
+        bool backCull = projected < -clusterRadius;
 
-      return !(angleCull || frontCull || backCull); });
+        return !(angleCull || frontCull || backCull);
+      });
   }
 
   template <typename Cluster>
@@ -453,23 +454,25 @@ namespace
   }
 
   template <typename Cluster>
-  void RasterizeBox(const ezTransform& transform, ezUInt32 uiDecalIndex, const ezSimdMat4f& mInvView, const ezSimdMat4f& mViewProjection, Cluster* pClusters,
-    ezSimdBSphere* pClusterBoundingSpheres)
+  void RasterizeBox(const ezTransform& transform, ezUInt32 uiDecalIndex, const ezSimdMat4f& mView, const ezSimdMat4f& mViewProjection, Cluster* pClusters, const ezSimdBSphere* pClusterBoundingSpheres)
   {
-    ezSimdMat4f boxToWorld = ezSimdConversion::ToTransform(transform).GetAsMat4();
-    ezSimdMat4f viewToBox = boxToWorld.GetInverse() * mInvView;
+    const ezSimdVec4f decalHalfExtents = ezSimdConversion::ToVec3(transform.m_vScale);
+    ezSimdBBox localDecalBounds = ezSimdBBox(-decalHalfExtents, decalHalfExtents);
 
     ezVec3 corners[8];
-    ezBoundingBox::MakeFromMinMax(ezVec3(-1), ezVec3(1)).GetCorners(corners);
+    ezSimdConversion::ToBBox(localDecalBounds).GetCorners(corners);
 
-    ezSimdMat4f decalToScreen = mViewProjection * boxToWorld;
+    const ezSimdTransform boxTransform = ezSimdTransform::Make(ezSimdConversion::ToVec3(transform.m_vPosition), ezSimdConversion::ToQuat(transform.m_qRotation));
+    const ezSimdMat4f boxToWorld = boxTransform.GetAsMat4();
+    const ezSimdMat4f decalToScreen = mViewProjection * boxToWorld;
+
     ezSimdBBox screenSpaceBounds = ezSimdBBox::MakeInvalid();
     bool bInsideBox = false;
     for (ezUInt32 i = 0; i < 8; ++i)
     {
-      ezSimdVec4f corner = ezSimdConversion::ToVec3(corners[i]);
+      const ezSimdVec4f corner = ezSimdConversion::ToVec3(corners[i]);
       ezSimdVec4f screenSpaceCorner = decalToScreen.TransformPosition(corner);
-      ezSimdFloat depth = screenSpaceCorner.w();
+      const ezSimdFloat depth = screenSpaceCorner.w();
       bInsideBox |= depth < ezSimdFloat::MakeZero();
 
       screenSpaceCorner /= depth;
@@ -485,17 +488,18 @@ namespace
       screenSpaceBounds.m_Max = ezSimdVec4f(1.0f).GetCombined<ezSwizzle::XYZW>(screenSpaceBounds.m_Max);
     }
 
-    ezSimdVec4f decalHalfExtents = ezSimdVec4f(1.0f);
-    ezSimdBBox localDecalBounds = ezSimdBBox(-decalHalfExtents, decalHalfExtents);
-
     const ezUInt32 uiBlockIndex = uiDecalIndex / 32;
     const ezUInt32 uiMask = 1 << (uiDecalIndex - uiBlockIndex * 32);
 
-    FillCluster(screenSpaceBounds, uiBlockIndex, uiMask, pClusters, [&](ezUInt32 uiClusterIndex)
-      {
-      ezSimdBSphere clusterSphere = pClusterBoundingSpheres[uiClusterIndex];
-      clusterSphere.Transform(viewToBox);
+    const ezSimdMat4f viewToBox = (mView * boxToWorld).GetInverse();
 
-      return localDecalBounds.Overlaps(clusterSphere); });
+    FillCluster(screenSpaceBounds, uiBlockIndex, uiMask, pClusters,
+      [&](ezUInt32 uiClusterIndex)
+      {
+        ezSimdBSphere clusterSphere = pClusterBoundingSpheres[uiClusterIndex];
+        clusterSphere.Transform(viewToBox);
+
+        return localDecalBounds.Overlaps(clusterSphere);
+      });
   }
 } // namespace

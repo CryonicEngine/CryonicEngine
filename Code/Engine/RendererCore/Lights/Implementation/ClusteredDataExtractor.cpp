@@ -219,8 +219,6 @@ void ezClusteredDataExtractor::PostSortAndBatch(const ezView& view, const ezDyna
 
   pCamera->GetProjectionMatrix(fAspectRatio, tmp);
   ezSimdMat4f projectionMatrix = ezSimdConversion::ToMat4(tmp);
-
-  ezSimdMat4f invViewMatrix = viewMatrix.GetInverse();
   ezSimdMat4f viewProjectionMatrix = projectionMatrix * viewMatrix;
 
   // Lights
@@ -359,7 +357,7 @@ void ezClusteredDataExtractor::PostSortAndBatch(const ezView& view, const ezDyna
         {
           FillDecalData(m_TempDecalData.ExpandAndGetRef(), pDecalRenderData);
 
-          RasterizeBox(pDecalRenderData->m_GlobalTransform, uiDecalIndex, invViewMatrix, viewProjectionMatrix, m_TempDecalsClusters.GetData(), m_ClusterBoundingSpheres.GetData());
+          RasterizeBox(pDecalRenderData->m_GlobalTransform, uiDecalIndex, viewMatrix, viewProjectionMatrix, m_TempDecalsClusters.GetData(), m_ClusterBoundingSpheres.GetData());
         }
         else
         {
@@ -430,7 +428,7 @@ void ezClusteredDataExtractor::PostSortAndBatch(const ezView& view, const ezDyna
             // const ezBoundingBox aabb(ezVec3(-1.0f), ezVec3(1.0f));
             // ezDebugRenderer::DrawLineBox(view.GetHandle(), aabb, ezColor::DarkBlue, transform);
 
-            RasterizeBox(transform, uiProbeIndex, invViewMatrix, viewProjectionMatrix, m_TempReflectionProbeClusters.GetData(), m_ClusterBoundingSpheres.GetData());
+            RasterizeBox(transform, uiProbeIndex, viewMatrix, viewProjectionMatrix, m_TempReflectionProbeClusters.GetData(), m_ClusterBoundingSpheres.GetData());
           }
         }
         else
