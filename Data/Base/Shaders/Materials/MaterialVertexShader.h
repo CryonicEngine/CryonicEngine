@@ -1,6 +1,8 @@
 #pragma once
 
-#define USE_WORLDPOS
+#ifndef USE_WORLDPOS
+#  define USE_WORLDPOS
+#endif
 
 #include <Shaders/Common/GlobalConstants.h>
 #include <Shaders/Common/ObjectConstants.h>
