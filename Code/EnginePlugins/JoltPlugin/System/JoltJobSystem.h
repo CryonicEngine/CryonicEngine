@@ -4,16 +4,6 @@
 #include <Jolt/Core/FixedSizeFreeList.h>
 #include <Jolt/Core/JobSystemWithBarrier.h>
 
-class ezJoltJobSystem;
-
-class ezJoltTask : public ezTask
-{
-public:
-  void* m_pJob = nullptr;
-
-  virtual void Execute() override;
-};
-
 class ezJoltJobSystem final : public JPH::JobSystemWithBarrier
 {
 public:
@@ -26,9 +16,9 @@ public:
   virtual void QueueJobs(Job** pJobs, ezUInt32 uiNumJobs) override;
   virtual void FreeJob(Job* pJob) override;
 
-  static void Execute(void* pJob);
-
 private:
+  static void OnTaskFinished(const ezSharedPtr<ezTask>& task);
+
   class CustomJob : public JPH::JobSystem::Job
   {
   public:
@@ -39,6 +29,15 @@ private:
 
     ezUInt32 m_uiJobIndex = ezInvalidIndex;
   };
+
+  class ezJoltTask : public ezTask
+  {
+  public:
+    CustomJob* m_pJob = nullptr;
+
+    virtual void Execute() override;
+  };
+
 
   using AvailableJobs = JPH::FixedSizeFreeList<CustomJob>;
   AvailableJobs m_Jobs;

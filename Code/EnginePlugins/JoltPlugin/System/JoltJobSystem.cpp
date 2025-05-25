@@ -13,7 +13,7 @@ ezJoltJobSystem::ezJoltJobSystem(ezUInt32 uiMaxJobs, ezUInt32 uiMaxBarriers)
   for (ezUInt32 i = 0; i < m_Tasks.GetCount(); ++i)
   {
     m_Tasks[i] = EZ_DEFAULT_NEW(ezJoltTask);
-    m_Tasks[i]->ConfigureTask("Jolt", ezTaskNesting::Never);
+    m_Tasks[i]->ConfigureTask("Jolt", ezTaskNesting::Never, &ezJoltJobSystem::OnTaskFinished);
   }
 }
 
@@ -32,7 +32,7 @@ JPH::JobHandle ezJoltJobSystem::CreateJob(const char* szName, JPH::ColorArg colo
     if (index != AvailableJobs::cInvalidObjectIndex)
       break;
 
-    EZ_ASSERT_DEBUG(false, "No jobs available!");
+    EZ_ASSERT_DEBUG(false, "No Jolt jobs available!");
     ezThreadUtils::YieldTimeSlice();
   }
 
@@ -42,7 +42,7 @@ JPH::JobHandle ezJoltJobSystem::CreateJob(const char* szName, JPH::ColorArg colo
 #if EZ_ENABLED(EZ_COMPILE_FOR_DEVELOPMENT)
   {
     ezStringBuilder name("Jolt-", szName);
-    m_Tasks[index]->ConfigureTask(name, ezTaskNesting::Never);
+    m_Tasks[index]->ConfigureTask(name, ezTaskNesting::Never, &ezJoltJobSystem::OnTaskFinished);
   }
 #endif
 
@@ -62,12 +62,15 @@ void ezJoltJobSystem::FreeJob(Job* pJob)
   m_Jobs.DestructObject(static_cast<CustomJob*>(pJob));
 }
 
-void ezJoltJobSystem::Execute(void* pJob)
+void ezJoltJobSystem::OnTaskFinished(const ezSharedPtr<ezTask>& task)
 {
-  auto* pJoltJob = static_cast<JPH::JobSystem::Job*>(pJob);
+  ezJoltTask* pTask = static_cast<ezJoltTask*>(task.Borrow());
 
-  pJoltJob->Execute();
-  pJoltJob->Release();
+  auto* pJob = static_cast<JPH::JobSystem::Job*>(pTask->m_pJob);
+  pTask->m_pJob = nullptr;
+
+  // doing this here prevens a race condition in reusing tasks
+  pJob->Release();
 }
 
 void ezJoltJobSystem::QueueJob(Job* pJob)
@@ -77,7 +80,7 @@ void ezJoltJobSystem::QueueJob(Job* pJob)
 
   const auto& pTask = m_Tasks[pMyJob->m_uiJobIndex];
 
-  pTask->m_pJob = pJob;
+  pTask->m_pJob = pMyJob;
 
   ezTaskSystem::StartSingleTask(pTask, ezTaskPriority::EarlyThisFrame);
 }
@@ -90,8 +93,7 @@ void ezJoltJobSystem::QueueJobs(Job** pJob, ezUInt32 uiNum_Jobs)
   }
 }
 
-void ezJoltTask::Execute()
+void ezJoltJobSystem::ezJoltTask::Execute()
 {
-  ezJoltJobSystem::Execute(m_pJob);
-  m_pJob = nullptr;
+  m_pJob->Execute();
 }
