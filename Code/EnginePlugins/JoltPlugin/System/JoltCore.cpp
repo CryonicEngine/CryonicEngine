@@ -36,7 +36,8 @@ EZ_END_STATIC_REFLECTED_BITFLAGS;
 // clang-format on
 
 ezJoltMaterial* ezJoltCore::s_pDefaultMaterial = nullptr;
-ezUniquePtr<JPH::JobSystem> ezJoltCore::s_pJobSystem;
+ezUniquePtr<JPH::JobSystem> ezJoltCore::s_pJobSystemEZ;
+std::unique_ptr<JPH::JobSystem> ezJoltCore::s_pJobSystemJolt;
 ezUniquePtr<ezProxyAllocator> ezJoltCore::s_pAllocator;
 ezUniquePtr<ezProxyAllocator> ezJoltCore::s_pAllocatorAligned;
 ezCollisionFilterConfig ezJoltCore::s_CollisionFilterConfig;
@@ -65,6 +66,30 @@ static bool JoltAssertFailed(const char* szInExpression, const char* szInMessage
 };
 
 #endif // JPH_ENABLE_ASSERTS
+
+ezCVarBool cvar_JoltUseEzTaskSystem("Jolt.UseEzTaskSystem", true, ezCVarFlags::Save, "Use the EZ TaskSystem for Jolt updates");
+
+JPH::JobSystem* ezJoltCore::GetJoltJobSystem()
+{
+  if (cvar_JoltUseEzTaskSystem)
+  {
+    if (s_pJobSystemEZ == nullptr)
+    {
+      s_pJobSystemEZ = EZ_NEW(ezFoundation::GetAlignedAllocator(), ezJoltJobSystem, JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers);
+    }
+
+    return s_pJobSystemEZ.Borrow();
+  }
+  else
+  {
+    if (s_pJobSystemJolt == nullptr)
+    {
+      s_pJobSystemJolt = std::make_unique<JPH::JobSystemThreadPool>(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
+    }
+
+    return s_pJobSystemJolt.get();
+  }
+}
 
 void ezJoltCore::DebugDraw(ezWorld* pWorld)
 {
@@ -172,8 +197,6 @@ void ezJoltCore::Startup()
 
   ezJoltCustomShapeInfo::sRegister();
 
-  s_pJobSystem = EZ_NEW(ezFoundation::GetAlignedAllocator(), ezJoltJobSystem, JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers);
-
   s_pDefaultMaterial = new ezJoltMaterial;
   s_pDefaultMaterial->AddRef();
   JPH::PhysicsMaterial::sDefault = s_pDefaultMaterial;
@@ -196,7 +219,8 @@ void ezJoltCore::Shutdown()
   s_pDefaultMaterial->Release();
   s_pDefaultMaterial = nullptr;
 
-  s_pJobSystem = nullptr;
+  s_pJobSystemEZ = nullptr;
+  s_pJobSystemJolt = nullptr;
 
   delete JPH::Factory::sInstance;
   JPH::Factory::sInstance = nullptr;
