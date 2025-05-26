@@ -181,7 +181,7 @@ static JPH::Ref<JPH::SoftBodySharedSettings> CreateCloth(ezVec2U32 vSegments, ez
   // Create settings
   JPH::SoftBodySharedSettings* settings = new JPH::SoftBodySharedSettings;
 
-  const float fMassPerVertex = fMass / (vSegments.x * vSegments.y);
+  const float fMassPerVertex = fMass; // / (vSegments.x * vSegments.y); // this creates too much instability
   const float fInvVtxMass = 1.0f / fMassPerVertex;
 
   for (ezUInt32 y = 0; y < vSegments.y; ++y)
