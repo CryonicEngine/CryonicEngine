@@ -13,6 +13,7 @@ class ezJoltQueryShapeActorComponent;
 class ezJoltRagdollComponent;
 class ezJoltRopeComponent;
 class ezJoltActorComponent;
+class ezJoltClothSheetComponent;
 
 class ezJoltUserData
 {
@@ -73,6 +74,12 @@ public:
   EZ_ALWAYS_INLINE void Init(ezJoltRopeComponent* pObject)
   {
     m_Type = Type::RopeComponent;
+    m_pObject = pObject;
+  }
+
+  EZ_ALWAYS_INLINE void Init(ezJoltClothSheetComponent* pObject)
+  {
+    m_Type = Type::ClothSheetComponent;
     m_pObject = pObject;
   }
 
@@ -142,6 +149,17 @@ public:
     return nullptr;
   }
 
+  EZ_FORCE_INLINE static ezJoltClothSheetComponent* GetClothSheetComponent(const void* pUserData)
+  {
+    const ezJoltUserData* pJoltUserData = static_cast<const ezJoltUserData*>(pUserData);
+    if (pJoltUserData != nullptr && pJoltUserData->m_Type == Type::ClothSheetComponent)
+    {
+      return static_cast<ezJoltClothSheetComponent*>(pJoltUserData->m_pObject);
+    }
+
+    return nullptr;
+  }
+
   // EZ_FORCE_INLINE static ezJoltShapeComponent* GetShapeComponent(const void* pUserData)
   //{
   //   const ezJoltUserData* pJoltUserData = static_cast<const ezJoltUserData*>(pUserData);
@@ -189,6 +207,7 @@ private:
     QueryShapeActorComponent,
     RagdollComponent,
     RopeComponent,
+    ClothSheetComponent,
   };
 
   Type m_Type = Type::Invalid;

@@ -14,6 +14,7 @@ EZ_BEGIN_STATIC_REFLECTED_BITFLAGS(ezPhysicsShapeType, 1)
   EZ_BITFLAGS_CONSTANT(ezPhysicsShapeType::Character),
   EZ_BITFLAGS_CONSTANT(ezPhysicsShapeType::Ragdoll),
   EZ_BITFLAGS_CONSTANT(ezPhysicsShapeType::Rope),
+  EZ_BITFLAGS_CONSTANT(ezPhysicsShapeType::Cloth),
 EZ_END_STATIC_REFLECTED_BITFLAGS;
 
 EZ_IMPLEMENT_MESSAGE_TYPE(ezMsgPhysicsAddImpulse);

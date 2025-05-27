@@ -82,7 +82,7 @@ bool ezJoltWorldModule::Raycast(ezPhysicsCastResult& out_result, const ezVec3& v
   if (params.m_bIgnoreInitialOverlap)
   {
     JPH::RayCastSettings opt;
-    opt.mBackFaceModeTriangles = JPH::EBackFaceMode::IgnoreBackFaces;
+    opt.mBackFaceModeTriangles = JPH::EBackFaceMode::CollideWithBackFaces; // necessary for soft bodies to work right
     opt.mBackFaceModeConvex = JPH::EBackFaceMode::IgnoreBackFaces;
     opt.mTreatConvexAsSolid = false;
 
@@ -324,7 +324,7 @@ bool ezJoltWorldModule::OverlapTestBox(const ezVec3& vBoxExtents, const ezVec3& 
   const JPH::BoxShape shape(ezJoltConversionUtils::ToVec3(vBoxExtents.CompMul(transform.m_vScale.Abs()) * 0.5f));
 
   const JPH::Mat44 trans = JPH::Mat44::sRotationTranslation(ezJoltConversionUtils::ToQuat(transform.m_qRotation),
-                                                            ezJoltConversionUtils::ToVec3(transform.m_vPosition));
+    ezJoltConversionUtils::ToVec3(transform.m_vPosition));
 
   return OverlapTest(shape, trans, params);
 }
@@ -409,7 +409,7 @@ void ezJoltWorldModule::QueryShapesInBox(ezPhysicsOverlapResultArray& out_result
 
   const JPH::BoxShape shape(ezJoltConversionUtils::ToVec3(vBoxExtents.CompMul(transform.m_vScale.Abs()) * 0.5f));
   const JPH::Mat44 trans = JPH::Mat44::sRotationTranslation(ezJoltConversionUtils::ToQuat(transform.m_qRotation),
-                                                            ezJoltConversionUtils::ToVec3(transform.m_vPosition));
+    ezJoltConversionUtils::ToVec3(transform.m_vPosition));
 
   QueryShapes(out_results, shape, trans, params);
 }

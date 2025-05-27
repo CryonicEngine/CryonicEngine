@@ -279,6 +279,7 @@ void ezRaycastComponent::Update()
   if (!vOldPos.IsEqual(vNewPos, 0.001f))
   {
     pEndObject->SetGlobalPosition(vNewPos);
+    pEndObject->SetGlobalRotation(GetOwner()->GetGlobalRotation());
     bAnyChange = true;
   }
 

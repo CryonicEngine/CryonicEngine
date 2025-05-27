@@ -196,7 +196,8 @@ private:
   ezBitflags<ezJoltClothSheetFlags> m_Flags;
   mutable ezRenderData::Category m_RenderDataCategory;
   ezUInt8 m_uiSleepCounter = 0;
-
+  ezUInt32 m_uiObjectFilterID = ezInvalidIndex;
+  ezUInt32 m_uiUserDataIndex = ezInvalidIndex;
   ezUInt32 m_uiJoltBodyID = ezInvalidIndex;
   ezBoundingSphere m_BSphere;
 };

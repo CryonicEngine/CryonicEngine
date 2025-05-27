@@ -173,6 +173,14 @@ void ezJoltClothSheetComponent::OnSimulationStarted()
 {
   SUPER::OnSimulationStarted();
 
+  if (m_uiObjectFilterID == ezInvalidIndex)
+  {
+    // only create a new filter ID, if none has been passed in manually
+
+    ezJoltWorldModule* pModule = GetWorld()->GetOrCreateModule<ezJoltWorldModule>();
+    m_uiObjectFilterID = pModule->CreateObjectFilterID();
+  }
+
   SetupCloth();
 }
 
@@ -337,22 +345,28 @@ void ezJoltClothSheetComponent::SetupCloth()
       }
     }
 
+    ezJoltWorldModule* pModule = GetWorld()->GetOrCreateModule<ezJoltWorldModule>();
+    auto* pSystem = pModule->GetJoltSystem();
+    auto* pBodies = &pSystem->GetBodyInterface();
+
     JPH::Ref<JPH::SoftBodySharedSettings> settings = CreateCloth(m_vSegments, m_vSize.CompDiv(ezVec2(static_cast<float>(m_vSegments.x - 1), static_cast<float>(m_vSegments.y - 1))), m_Flags, fPerVertexMass);
 
     settings->mVertexRadius = m_fThickness;
 
     ezTransform t = GetOwner()->GetGlobalTransform();
 
+    ezJoltUserData* pUserData = nullptr;
+    m_uiUserDataIndex = pModule->AllocateUserData(pUserData);
+    pUserData->Init(this);
+
     JPH::SoftBodyCreationSettings cloth(settings, ezJoltConversionUtils::ToVec3(t.m_vPosition), ezJoltConversionUtils::ToQuat(t.m_qRotation), ezJoltCollisionFiltering::ConstructObjectLayer(m_uiCollisionLayer, ezJoltBroadphaseLayer::Cloth));
 
     cloth.mPressure = 0.0f;
     cloth.mLinearDamping = m_fDamping;
     cloth.mGravityFactor = m_fGravityFactor;
-    // cloth.mUserData = TODO ?
-
-    ezJoltWorldModule* pModule = GetWorld()->GetOrCreateModule<ezJoltWorldModule>();
-    auto* pSystem = pModule->GetJoltSystem();
-    auto* pBodies = &pSystem->GetBodyInterface();
+    cloth.mUserData = reinterpret_cast<ezUInt64>(pUserData);
+    cloth.mCollisionGroup.SetGroupID(m_uiObjectFilterID);
+    // cloth.mCollisionGroup.SetGroupFilter(pModule->GetGroupFilter()); // the group filter is only needed for objects constrained via joints
 
     auto pBody = pBodies->CreateSoftBody(cloth);
 
@@ -431,6 +445,11 @@ void ezJoltClothSheetComponent::UpdateBodyBounds()
 void ezJoltClothSheetComponent::OnDeactivated()
 {
   RemoveBody();
+
+  ezJoltWorldModule* pModule = GetWorld()->GetModule<ezJoltWorldModule>();
+  pModule->DeallocateUserData(m_uiUserDataIndex);
+
+  pModule->DeleteObjectFilterID(m_uiObjectFilterID);
 
   SUPER::OnDeactivated();
 }
