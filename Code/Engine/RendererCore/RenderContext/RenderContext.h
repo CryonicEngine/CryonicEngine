@@ -201,6 +201,7 @@ public:
 
   ezGlobalConstants& WriteGlobalConstants();
   const ezGlobalConstants& ReadGlobalConstants() const;
+  void SetGlobalAndWorldTimeConstants(ezTime worldTime);
 
   /// \brief Sets the texture filter mode that is used by default for texture resources.
   ///

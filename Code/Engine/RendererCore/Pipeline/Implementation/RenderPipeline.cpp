@@ -1141,13 +1141,10 @@ void ezRenderPipeline::Render(ezRenderContext* pRenderContext)
   const bool bIsDirectionalLightShadow = pViewData->m_CameraUsageHint == ezCameraUsageHint::Shadow && pCamera->IsOrthographic();
   gc.MaxZValue = bIsDirectionalLightShadow ? 0.0f : ezMath::MinValue<float>();
 
-  // Wrap around to prevent floating point issues. Wrap around is dividable by all whole numbers up to 11.
-  gc.DeltaTime = (float)ezClock::GetGlobalClock()->GetTimeDiff().GetSeconds();
-  gc.GlobalTime = (float)ezMath::Mod(ezClock::GetGlobalClock()->GetAccumulatedTime().GetSeconds(), 20790.0);
-  gc.WorldTime = (float)ezMath::Mod(data.GetWorldTime().GetSeconds(), 20790.0);
-
   gc.Exposure = pCamera->GetExposure();
   gc.RenderPass = ezViewRenderMode::GetRenderPassForShader(pViewData->m_ViewRenderMode);
+
+  pRenderContext->SetGlobalAndWorldTimeConstants(data.GetWorldTime());
 
   ezRenderViewContext renderViewContext;
   renderViewContext.m_pCamera = pCamera;

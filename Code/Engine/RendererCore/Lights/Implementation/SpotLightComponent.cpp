@@ -2,6 +2,7 @@
 
 #include <Core/WorldSerializer/WorldReader.h>
 #include <Core/WorldSerializer/WorldWriter.h>
+#include <RendererCore/Decals/Implementation/DecalManager.h>
 #include <RendererCore/Lights/Implementation/ShadowPool.h>
 #include <RendererCore/Lights/SpotLightComponent.h>
 #include <RendererCore/Pipeline/View.h>
@@ -20,7 +21,10 @@ EZ_BEGIN_COMPONENT_TYPE(ezSpotLightComponent, 3, ezComponentMode::Static)
     EZ_ACCESSOR_PROPERTY("InnerSpotAngle", GetInnerSpotAngle, SetInnerSpotAngle)->AddAttributes(new ezClampValueAttribute(ezAngle::MakeZero(), c_MaxSpotAngle), new ezDefaultValueAttribute(ezAngle::MakeFromDegree(15.0f))),
     EZ_ACCESSOR_PROPERTY("OuterSpotAngle", GetOuterSpotAngle, SetOuterSpotAngle)->AddAttributes(new ezClampValueAttribute(ezAngle::MakeZero(), c_MaxSpotAngle), new ezDefaultValueAttribute(ezAngle::MakeFromDegree(30.0f))),
     EZ_ACCESSOR_PROPERTY("ShadowFadeOutRange", GetShadowFadeOutRange, SetShadowFadeOutRange)->AddAttributes(new ezClampValueAttribute(0.0f, ezVariant()), new ezSuffixAttribute(" m"), new ezMinValueTextAttribute("Auto")),
-    //EZ_ACCESSOR_PROPERTY("ProjectedTexture", GetProjectedTextureFile, SetProjectedTextureFile)->AddAttributes(new ezAssetBrowserAttribute("CompatibleAsset_Texture_2D")),
+    EZ_RESOURCE_ACCESSOR_PROPERTY("Cookie", GetCookie, SetCookie)->AddAttributes(new ezAssetBrowserAttribute("CompatibleAsset_Texture_2D")),
+    EZ_RESOURCE_ACCESSOR_PROPERTY("Material", GetMaterial, SetMaterial)->AddAttributes(new ezAssetBrowserAttribute("CompatibleAsset_Material", "Decal")),
+    EZ_ACCESSOR_PROPERTY("MaterialResolution", GetMaterialResolution, SetMaterialResolution)->AddAttributes(new ezClampValueAttribute(16, 1024), new ezDefaultValueAttribute(512)),
+    EZ_ACCESSOR_PROPERTY("MaterialUpdateInterval", GetMaterialUpdateInterval, SetMaterialUpdateInterval)->AddAttributes(new ezClampValueAttribute(0.0, 10.0), new ezDefaultValueAttribute(0.0f)),
   }
   EZ_END_PROPERTIES;
   EZ_BEGIN_MESSAGEHANDLERS
@@ -82,7 +86,7 @@ float ezSpotLightComponent::GetShadowFadeOutRange() const
 
 void ezSpotLightComponent::SetInnerSpotAngle(ezAngle spotAngle)
 {
-  m_InnerSpotAngle = ezMath::Clamp(spotAngle, ezAngle::MakeZero(), m_OuterSpotAngle);
+  m_InnerSpotAngle = ezMath::Clamp(spotAngle, ezAngle::MakeZero(), c_MaxSpotAngle);
 
   InvalidateCachedRenderData();
 }
@@ -94,7 +98,7 @@ ezAngle ezSpotLightComponent::GetInnerSpotAngle() const
 
 void ezSpotLightComponent::SetOuterSpotAngle(ezAngle spotAngle)
 {
-  m_OuterSpotAngle = ezMath::Clamp(spotAngle, m_InnerSpotAngle, c_MaxSpotAngle);
+  m_OuterSpotAngle = ezMath::Clamp(spotAngle, ezAngle::MakeZero(), c_MaxSpotAngle);
 
   TriggerLocalBoundsUpdate();
 }
@@ -104,37 +108,39 @@ ezAngle ezSpotLightComponent::GetOuterSpotAngle() const
   return m_OuterSpotAngle;
 }
 
-// void ezSpotLightComponent::SetProjectedTexture(const ezTexture2DResourceHandle& hProjectedTexture)
-//{
-//   m_hProjectedTexture = hProjectedTexture;
-//
-//   InvalidateCachedRenderData();
-// }
-//
-// const ezTexture2DResourceHandle& ezSpotLightComponent::GetProjectedTexture() const
-//{
-//   return m_hProjectedTexture;
-// }
-//
-// void ezSpotLightComponent::SetProjectedTextureFile(const char* szFile)
-//{
-//   ezTexture2DResourceHandle hProjectedTexture;
-//
-//   if (!ezStringUtils::IsNullOrEmpty(szFile))
-//   {
-//     hProjectedTexture = ezResourceManager::LoadResource<ezTexture2DResource>(szFile);
-//   }
-//
-//   SetProjectedTexture(hProjectedTexture);
-// }
-//
-// const char* ezSpotLightComponent::GetProjectedTextureFile() const
-//{
-//   if (!m_hProjectedTexture.IsValid())
-//     return "";
-//
-//   return m_hProjectedTexture.GetResourceID();
-// }
+void ezSpotLightComponent::SetCookie(const ezTexture2DResourceHandle& hCookie)
+{
+  if (m_hCookie != hCookie)
+  {
+    m_hCookie = hCookie;
+
+    InvalidateCachedRenderData();
+  }
+}
+
+void ezSpotLightComponent::SetMaterial(const ezMaterialResourceHandle& hMaterial)
+{
+  if (m_hMaterial != hMaterial)
+  {
+    m_hMaterial = hMaterial;
+
+    InvalidateCachedRenderData();
+  }
+}
+
+void ezSpotLightComponent::SetMaterialResolution(ezUInt32 uiResolution)
+{
+  m_uiMaterialResolution = ezMath::Clamp(uiResolution, 16u, 1024u);
+
+  // No need to invalidate cached render data, render data is not cached if a material is used.
+}
+
+void ezSpotLightComponent::SetMaterialUpdateInterval(ezTime updateInterval)
+{
+  m_MaterialUpdateInterval = ezMath::Clamp(updateInterval.AsFloatInSeconds(), 0.0f, 10.0f);
+
+  // No need to invalidate cached render data, render data is not cached if a material is used.
+}
 
 void ezSpotLightComponent::OnMsgExtractRenderData(ezMsgExtractRenderData& msg) const
 {
@@ -166,7 +172,17 @@ void ezSpotLightComponent::OnMsgExtractRenderData(ezMsgExtractRenderData& msg) c
   pRenderData->m_fRange = m_fEffectiveRange;
   pRenderData->m_InnerSpotAngle = m_InnerSpotAngle;
   pRenderData->m_OuterSpotAngle = m_OuterSpotAngle;
-  // pRenderData->m_hProjectedTexture = m_hProjectedTexture;
+
+  // Spotlight bounds tend to be way larger than the projected area thus times 0.5
+  const float fScreenSpaceSizeForCookie = fScreenSpaceSize * 0.5f;
+  if (m_hMaterial.IsValid())
+  {
+    pRenderData->m_CookieId = ezDecalManager::GetOrAddRuntimeDecal(m_hMaterial, m_uiMaterialResolution, ezTime::MakeFromSeconds(m_MaterialUpdateInterval), fScreenSpaceSizeForCookie, msg.m_pView);
+  }
+  else if (m_hCookie.IsValid())
+  {
+    pRenderData->m_CookieId = ezDecalManager::GetOrAddRuntimeDecal(m_hCookie, fScreenSpaceSizeForCookie, msg.m_pView);
+  }
 
   if (m_bCastShadows && fShadowFadeOut > 0.0f)
   {
@@ -179,7 +195,7 @@ void ezSpotLightComponent::OnMsgExtractRenderData(ezMsgExtractRenderData& msg) c
 
   pRenderData->FillBatchIdAndSortingKey(fScreenSpaceSize);
 
-  ezRenderData::Caching::Enum caching = m_bCastShadows ? ezRenderData::Caching::Never : ezRenderData::Caching::IfStatic;
+  ezRenderData::Caching::Enum caching = (m_bCastShadows || m_hCookie.IsValid() || m_hMaterial.IsValid()) ? ezRenderData::Caching::Never : ezRenderData::Caching::IfStatic;
   msg.AddRenderData(pRenderData, ezDefaultRenderDataCategories::Light, caching);
 }
 
@@ -193,7 +209,7 @@ void ezSpotLightComponent::SerializeComponent(ezWorldWriter& inout_stream) const
   s << m_fShadowFadeOutRange;
   s << m_InnerSpotAngle;
   s << m_OuterSpotAngle;
-  s << ""; // GetProjectedTextureFile();
+  s << GetCookieFile();
 }
 
 void ezSpotLightComponent::DeserializeComponent(ezWorldReader& inout_stream)
@@ -214,7 +230,7 @@ void ezSpotLightComponent::DeserializeComponent(ezWorldReader& inout_stream)
 
   ezStringBuilder temp;
   s >> temp;
-  // SetProjectedTextureFile(temp);
+  SetCookieFile(temp);
 }
 
 ezBoundingSphere ezSpotLightComponent::CalculateBoundingSphere(const ezTransform& t, float fRange) const

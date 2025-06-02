@@ -2,6 +2,7 @@
 
 #include <Foundation/Algorithm/HashStream.h>
 #include <Foundation/Configuration/Startup.h>
+#include <Foundation/Time/Clock.h>
 #include <Foundation/Types/ScopeExit.h>
 #include <RendererCore/Material/MaterialManager.h>
 #include <RendererCore/Material/MaterialResource.h>
@@ -666,6 +667,8 @@ ezResult ezRenderContext::Dispatch(ezUInt32 uiThreadGroupCountX, ezUInt32 uiThre
 
 ezResult ezRenderContext::ApplyContextStates(bool bForce)
 {
+  EZ_ASSERT_DEBUG(m_bRendering || m_bCompute, "Must be either in a rendering or compute scope");
+
   // First apply material state since this can modify all other states.
   if (bForce || m_StateFlags.IsSet(ezRenderContextFlags::MaterialBindingChanged))
   {
@@ -857,6 +860,17 @@ const ezGlobalConstants& ezRenderContext::ReadGlobalConstants() const
   ezConstantBufferStorage<ezGlobalConstants>* pStorage = nullptr;
   EZ_VERIFY(TryGetConstantBufferStorage(m_hGlobalConstantBufferStorage, pStorage), "Invalid Global Constant Storage");
   return pStorage->GetDataForReading();
+}
+
+void ezRenderContext::SetGlobalAndWorldTimeConstants(ezTime worldTime)
+{
+  auto& gc = WriteGlobalConstants();
+
+  // Wrap around to prevent floating point issues. A wrap around of 1000 allows all frequencies with 3 digits after the decimal.
+  const double fWrapAround = 1000.0;
+  gc.DeltaTime = (float)ezClock::GetGlobalClock()->GetTimeDiff().GetSeconds();
+  gc.GlobalTime = (float)ezMath::Mod(ezClock::GetGlobalClock()->GetAccumulatedTime().GetSeconds(), fWrapAround);
+  gc.WorldTime = (float)ezMath::Mod(worldTime.GetSeconds(), fWrapAround);
 }
 
 // static
