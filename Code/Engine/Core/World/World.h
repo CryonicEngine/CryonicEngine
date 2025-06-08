@@ -402,8 +402,9 @@ private:
   EZ_ALLOW_PRIVATE_PROPERTIES(ezWorld);
 
   ezGameObject* Reflection_TryGetObjectWithGlobalKey(ezTempHashedString sGlobalKey);
-  ezClock* Reflection_GetClock();
   ezGameObject* Reflection_SearchForObject(ezStringView sSearchPath, ezGameObject* pReferenceObject) { return SearchForObject(sSearchPath, pReferenceObject, nullptr); }
+  ezClock* Reflection_GetClock();
+  ezRandom* Reflection_GetRandomNumberGenerator();
 
   void CheckForReadAccess() const;
   void CheckForWriteAccess() const;

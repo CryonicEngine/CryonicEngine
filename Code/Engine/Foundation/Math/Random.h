@@ -3,6 +3,7 @@
 #include <Foundation/Containers/DynamicArray.h>
 #include <Foundation/IO/Stream.h>
 #include <Foundation/Math/Declarations.h>
+#include <Foundation/Reflection/Reflection.h>
 
 /// \brief A random number generator. Currently uses the WELL512 algorithm.
 class EZ_FOUNDATION_DLL ezRandom
@@ -88,6 +89,8 @@ private:
   ezUInt32 m_uiIndex = 0;
   ezUInt32 m_uiState[16];
 };
+
+EZ_DECLARE_REFLECTABLE_TYPE(EZ_FOUNDATION_DLL, ezRandom);
 
 
 /// \brief A random number generator that produces values with a normal / Gaussian distribution
