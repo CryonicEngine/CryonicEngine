@@ -613,7 +613,7 @@ void ezDecalManager::OnRenderEvent(const ezRenderWorldRenderEvent& e)
       pRenderContext->SetGlobalAndWorldTimeConstants(updateInfo.m_WorldTime);
       pRenderContext->BindMaterial(updateInfo.m_hMaterial);
 
-      pRenderContext->DrawMeshBuffer().AssertSuccess();
+      pRenderContext->DrawMeshBuffer().IgnoreResult();
     }
 
     pRenderContext->EndRendering();
