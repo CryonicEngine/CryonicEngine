@@ -45,7 +45,6 @@ ezCVarBool cvar_RenderingDecalsShowAtlasTexture("Rendering.Decals.ShowAtlasTextu
 ///       but they can also be overwritten in custom game states at startup.
 EZ_RENDERERCORE_DLL ezCVarInt cvar_RenderingDecalsDynamicAtlasSize("Rendering.Decals.DynamicAtlasSize", 3072, ezCVarFlags::RequiresDelayedSync, "The size of the dynamic decal atlas texture.");
 
-constexpr ezUInt32 s_uiMinDecalSize = 16;
 constexpr ezUInt32 s_uiMaxDecalSize = 1024;
 
 static ezUInt32 s_uiLastConfigModification = 0;
@@ -68,8 +67,10 @@ ezPerDecalAtlasData MakeAtlasData(const ezRectU16& rect, const ezVec2& vTextureS
 
 struct DecalInfo
 {
+  ezUInt32 m_uiRefCount = 0;
+
   ezUInt8 m_uiGeneration = 1;
-  ezUInt32 m_uiAtlasDataOffset = ezInvalidIndex; // Also used as index into s_pData->m_DecalInfos
+  ezUInt16 m_uiAtlasDataOffset = ezSmallInvalidIndex; // Also used as index into s_pData->m_DecalInfos
   ezDynamicTextureAtlas::AllocationId m_atlasAllocationId;
 
   float m_fMaxScreenSpaceSize = 0.0f;
@@ -80,9 +81,13 @@ struct DecalInfo
   ezUInt16 m_uiMaxHeight = 0;
   float m_fUpdateInterval = ezTime::MakeFromHours(3600).AsFloatInSeconds();
 
-  ezTime m_AutoRemoveTime;
-  ezTime m_NextUpdateTime;
+  ezTime m_NextUpdateTime = ezTime::MakeFromHours(-1);
   ezTime m_WorldTime;
+
+  ezHashedString m_sName;
+
+  EZ_ALWAYS_INLINE bool IsStatic() const { return m_hTexture.IsValid(); }
+  EZ_ALWAYS_INLINE bool IsDynamic() const { return !IsStatic(); }
 
   float CalculateScore(ezTime now) const
   {
@@ -94,12 +99,12 @@ struct DecalInfo
 
   ezVec2U32 CalculateScaledSize() const
   {
-    const float fScreenSpaceSize = ezMath::Clamp(ezMath::Pow(m_fMaxScreenSpaceSize, 1.5f), 0.01f, 1.0f);
-    const ezUInt32 uiWidth = ezMath::Clamp(static_cast<ezUInt32>(m_uiMaxWidth * fScreenSpaceSize), s_uiMinDecalSize, s_uiMaxDecalSize);
-    const ezUInt32 uiHeight = ezMath::Clamp(static_cast<ezUInt32>(m_uiMaxHeight * fScreenSpaceSize), s_uiMinDecalSize, s_uiMaxDecalSize);
+    const float fScreenSpaceSize = ezMath::Saturate(ezMath::Pow(m_fMaxScreenSpaceSize, 1.2f));
+    const ezUInt32 uiWidth = ezMath::Min(static_cast<ezUInt32>(m_uiMaxWidth * fScreenSpaceSize), s_uiMaxDecalSize);
+    const ezUInt32 uiHeight = ezMath::Min(static_cast<ezUInt32>(m_uiMaxHeight * fScreenSpaceSize), s_uiMaxDecalSize);
 
-    const ezUInt32 uiWidthAlign = uiWidth < 32 ? 16 : 32;
-    const ezUInt32 uiHeightAlign = uiHeight < 32 ? 16 : 32;
+    const ezUInt32 uiWidthAlign = uiWidth < 64 ? 16 : 64;
+    const ezUInt32 uiHeightAlign = uiHeight < 64 ? 16 : 64;
     return ezVec2U32(ezMemoryUtils::AlignSize(uiWidth, uiWidthAlign), ezMemoryUtils::AlignSize(uiHeight, uiHeightAlign));
   }
 
@@ -115,26 +120,64 @@ struct DecalInfo
     return 0;
   }
 
-  EZ_FORCE_INLINE void Update(float fScreenSpaceSize, const ezView* pReferenceView, ezTime inactiveTimeBeforeAutoRemove)
+  EZ_FORCE_INLINE void SetUpdateInterval(ezTime updateInterval)
+  {
+    m_fUpdateInterval = ezMath::Min(m_fUpdateInterval, updateInterval.AsFloatInSeconds());
+    m_NextUpdateTime = ezMath::Min(m_NextUpdateTime, ezTime::Now() + ezTime::MakeFromSeconds(m_fUpdateInterval));
+  }
+
+  EZ_FORCE_INLINE void MarkUsage(float fScreenSpaceSize, const ezView* pReferenceView)
   {
     m_fMaxScreenSpaceSize = ezMath::Max(m_fMaxScreenSpaceSize, fScreenSpaceSize);
-    m_AutoRemoveTime = ezTime::Now() + inactiveTimeBeforeAutoRemove;
 
-    if (pReferenceView->GetCameraUsageHint() == ezCameraUsageHint::MainView || pReferenceView->GetCameraUsageHint() == ezCameraUsageHint::EditorView || m_WorldTime.IsZero())
+    if (pReferenceView != nullptr && pReferenceView->GetWorld() != nullptr)
     {
-      if (const ezWorld* pWorld = pReferenceView->GetWorld())
+      const bool bIsMainView = pReferenceView->GetCameraUsageHint() == ezCameraUsageHint::MainView || pReferenceView->GetCameraUsageHint() == ezCameraUsageHint::EditorView;
+      if (bIsMainView || m_WorldTime.IsZero())
       {
-        m_WorldTime = pWorld->GetClock().GetAccumulatedTime();
+        m_WorldTime = pReferenceView->GetWorld()->GetClock().GetAccumulatedTime();
+      }
+    }
+
+    if (m_sName.IsEmpty())
+    {
+      if (m_hTexture.IsValid())
+      {
+        ezResourceLock<ezTexture2DResource> pTexture(m_hTexture, ezResourceAcquireMode::AllowLoadingFallback);
+        if (pTexture.GetAcquireResult() != ezResourceAcquireResult::Final || pTexture->GetNumQualityLevelsLoadable() > 0)
+          return;
+
+        m_uiMaxWidth = ezMath::Min(pTexture->GetWidth(), s_uiMaxDecalSize);
+        m_uiMaxHeight = ezMath::Min(pTexture->GetHeight(), s_uiMaxDecalSize);
+        m_sName.Assign(GetNameFromResource(*pTexture.GetPointer()));
+      }
+      else
+      {
+        EZ_ASSERT_DEV(m_hMaterial.IsValid(), "DecalInfo must have either a texture or a material assigned.");
+
+        ezResourceLock<ezMaterialResource> pMaterial(m_hMaterial, ezResourceAcquireMode::AllowLoadingFallback);
+        if (pMaterial.GetAcquireResult() != ezResourceAcquireResult::Final)
+          return;
+
+        m_sName.Assign(DecalInfo::GetNameFromResource(*pMaterial.GetPointer()));
       }
     }
   }
 
-  EZ_ALWAYS_INLINE static ezUInt64 GetKey(ezTexture2DResourceHandle hTexture)
+  EZ_FORCE_INLINE void ResetAfterUpdate()
+  {
+    m_fMaxScreenSpaceSize = 0.0f;
+
+    m_NextUpdateTime = ezTime::Now() + ezTime::MakeFromSeconds(m_fUpdateInterval);
+    m_WorldTime = ezTime::MakeZero();
+  }
+
+  EZ_ALWAYS_INLINE static ezUInt64 GetKey(const ezTexture2DResourceHandle& hTexture)
   {
     return hTexture.GetResourceIDHash();
   }
 
-  EZ_ALWAYS_INLINE static ezUInt64 GetKey(ezMaterialResourceHandle hMaterial)
+  EZ_ALWAYS_INLINE static ezUInt64 GetKey(const ezMaterialResourceHandle& hMaterial)
   {
     return hMaterial.GetResourceIDHash();
   }
@@ -158,6 +201,8 @@ struct SortedDecal
 
   ezUInt32 m_uiIndex;
   float m_fScore;
+
+  ezVec2U32 m_vNewSize;
 
   bool operator<(const SortedDecal& other) const
   {
@@ -269,13 +314,13 @@ struct ezDecalManager::Data
 ezDecalManager::Data* ezDecalManager::s_pData = nullptr;
 
 // static
-ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezTexture2DResourceHandle hTexture, float fScreenSpaceSize, const ezView* pReferenceView, ezTime inactiveTimeBeforeAutoRemove /*= ezTime::MakeFromSeconds(1)*/)
+ezDecalId ezDecalManager::GetOrCreateRuntimeDecal(const ezTexture2DResourceHandle& hTexture)
 {
   s_pData->EnsureResourceCreated();
 
-  EZ_LOCK(s_pData->m_Mutex);
+  const ezUInt64 uiKey = DecalInfo::GetKey(hTexture);
 
-  ezUInt64 uiKey = DecalInfo::GetKey(hTexture);
+  EZ_LOCK(s_pData->m_Mutex);
 
   bool bExisted = false;
   ezUInt32& uiIndex = s_pData->m_DecalKeyToInfoIndex.FindOrAdd(uiKey, &bExisted);
@@ -289,6 +334,7 @@ ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezTexture2DResourceHandle hTextur
     auto& decalInfo = s_pData->m_DecalInfos[uiIndex];
     decalInfo.m_uiAtlasDataOffset = uiIndex;
     decalInfo.m_hTexture = hTexture;
+    decalInfo.SetUpdateInterval(ezTime::MakeFromSeconds(0.1));
 
     ezStringBuilder decalMaterialName;
     decalMaterialName.AppendFormat("DecalMaterial_{0}", hTexture.GetResourceID());
@@ -306,18 +352,18 @@ ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezTexture2DResourceHandle hTextur
 
   auto& decalInfo = s_pData->m_DecalInfos[uiIndex];
   EZ_ASSERT_DEBUG(decalInfo.m_uiAtlasDataOffset == uiIndex, "Implementation error");
-  decalInfo.Update(fScreenSpaceSize, pReferenceView, inactiveTimeBeforeAutoRemove);
+  ++decalInfo.m_uiRefCount;
 
   return ezDecalId(uiIndex, decalInfo.m_uiGeneration);
 }
 
-ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezMaterialResourceHandle hMaterial, ezUInt32 uiResolution, ezTime updateInterval, float fScreenSpaceSize, const ezView* pReferenceView, ezTime inactiveTimeBeforeAutoRemove)
+ezDecalId ezDecalManager::GetOrCreateRuntimeDecal(const ezMaterialResourceHandle& hMaterial, ezUInt32 uiResolution, ezTime updateInterval)
 {
   s_pData->EnsureResourceCreated();
 
-  EZ_LOCK(s_pData->m_Mutex);
+  const ezUInt64 uiKey = DecalInfo::GetKey(hMaterial);
 
-  ezUInt64 uiKey = DecalInfo::GetKey(hMaterial);
+  EZ_LOCK(s_pData->m_Mutex);
 
   bool bExisted = false;
   ezUInt32& uiIndex = s_pData->m_DecalKeyToInfoIndex.FindOrAdd(uiKey, &bExisted);
@@ -335,10 +381,8 @@ ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezMaterialResourceHandle hMateria
 
   auto& decalInfo = s_pData->m_DecalInfos[uiIndex];
   EZ_ASSERT_DEBUG(decalInfo.m_uiAtlasDataOffset == uiIndex, "Implementation error");
-  decalInfo.Update(fScreenSpaceSize, pReferenceView, inactiveTimeBeforeAutoRemove);
-
-  decalInfo.m_fUpdateInterval = ezMath::Min(decalInfo.m_fUpdateInterval, updateInterval.AsFloatInSeconds());
-  decalInfo.m_NextUpdateTime = ezMath::Min(decalInfo.m_NextUpdateTime, ezTime::Now() + ezTime::MakeFromSeconds(decalInfo.m_fUpdateInterval));
+  decalInfo.SetUpdateInterval(updateInterval);
+  ++decalInfo.m_uiRefCount;
 
   decalInfo.m_uiMaxWidth = ezMath::Clamp<ezUInt16>(decalInfo.m_uiMaxWidth, uiResolution, s_uiMaxDecalSize);
   decalInfo.m_uiMaxHeight = decalInfo.m_uiMaxWidth;
@@ -347,15 +391,20 @@ ezDecalId ezDecalManager::GetOrAddRuntimeDecal(ezMaterialResourceHandle hMateria
 }
 
 // static
-void ezDecalManager::RemoveRuntimeDecal(ezDecalId decalId)
+void ezDecalManager::DeleteRuntimeDecal(ezDecalId& ref_decalId)
 {
-  EZ_LOCK(s_pData->m_Mutex);
-
-  if (decalId.m_InstanceIndex >= s_pData->m_DecalInfos.GetCount())
+  if (ref_decalId.IsInvalidated())
     return;
 
-  auto& decalInfo = s_pData->m_DecalInfos[decalId.m_InstanceIndex];
-  if (decalInfo.m_uiGeneration != decalId.m_Generation)
+  EZ_SCOPE_EXIT(ref_decalId.Invalidate());
+
+  EZ_LOCK(s_pData->m_Mutex);
+
+  auto& decalInfo = s_pData->m_DecalInfos[ref_decalId.m_InstanceIndex];
+  EZ_ASSERT_DEV(decalInfo.m_uiGeneration == ref_decalId.m_Generation, "Invalid decal id");
+
+  --decalInfo.m_uiRefCount;
+  if (decalInfo.m_uiRefCount > 0)
     return;
 
   if (decalInfo.m_atlasAllocationId.IsInvalidated() == false)
@@ -374,6 +423,20 @@ void ezDecalManager::RemoveRuntimeDecal(ezDecalId decalId)
   decalInfo.m_uiGeneration = generation + 1;
   if (decalInfo.m_uiGeneration == 0)
     decalInfo.m_uiGeneration = 1;
+}
+
+// static
+void ezDecalManager::MarkRuntimeDecalAsUsed(ezDecalId decalId, float fScreenSpaceSize, const ezView* pReferenceView)
+{
+  if (decalId.IsInvalidated())
+    return;
+
+  EZ_LOCK(s_pData->m_Mutex);
+
+  auto& decalInfo = s_pData->m_DecalInfos[decalId.m_InstanceIndex];
+  EZ_ASSERT_DEV(decalInfo.m_uiGeneration == decalId.m_Generation && decalInfo.m_uiRefCount > 0, "Invalid decal");
+
+  decalInfo.MarkUsage(fScreenSpaceSize, pReferenceView);
 }
 
 ezDecalAtlasResourceHandle ezDecalManager::GetBakedDecalAtlas()
@@ -454,37 +517,29 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
 
     for (auto& decalInfo : s_pData->m_DecalInfos)
     {
-      if (decalInfo.m_uiAtlasDataOffset == ezInvalidIndex)
+      if (decalInfo.m_uiAtlasDataOffset == ezInvalidIndex || decalInfo.m_sName.IsEmpty())
         continue;
 
-      if (now > decalInfo.m_AutoRemoveTime)
-      {
-        RemoveRuntimeDecal(ezDecalId(decalInfo.m_uiAtlasDataOffset, decalInfo.m_uiGeneration));
-      }
-      else
-      {
-        bool bShouldUpdate = now >= decalInfo.m_NextUpdateTime;
-        if (decalInfo.m_atlasAllocationId.IsInvalidated())
-        {
-          bShouldUpdate = true;
-        }
-        else
-        {
-          const ezRectU16 currentRect = s_pData->m_RuntimeAtlas.GetAllocationRect(decalInfo.m_atlasAllocationId);
-          const ezVec2U32 newSize = decalInfo.CalculateScaledSize();
+      if (decalInfo.m_NextUpdateTime > now)
+        continue;
 
-          if (currentRect.width != newSize.x || currentRect.height != newSize.y)
-          {
-            s_pData->m_RuntimeAtlas.Deallocate(decalInfo.m_atlasAllocationId);
-            bShouldUpdate = true;
-          }
-        }
-
-        if (bShouldUpdate)
-        {
-          s_pData->m_SortedDecals.PushBack({decalInfo.m_uiAtlasDataOffset, decalInfo.CalculateScore(now)});
-        }
+      const ezRectU16 currentRect = s_pData->m_RuntimeAtlas.GetAllocationRect(decalInfo.m_atlasAllocationId);
+      const ezVec2U32 newSize = decalInfo.CalculateScaledSize();
+      const bool bSizeChanged = currentRect.width != newSize.x || currentRect.height != newSize.y;
+      if (bSizeChanged)
+      {
+        s_pData->m_RuntimeAtlas.Deallocate(decalInfo.m_atlasAllocationId);
       }
+
+      if ((decalInfo.IsDynamic() || bSizeChanged) && newSize.IsZero() == false)
+      {
+        auto& sortedDecal = s_pData->m_SortedDecals.ExpandAndGetRef();
+        sortedDecal.m_uiIndex = decalInfo.m_uiAtlasDataOffset;
+        sortedDecal.m_fScore = decalInfo.CalculateScore(now);
+        sortedDecal.m_vNewSize = newSize;
+      }
+
+      decalInfo.ResetAfterUpdate();
     }
   }
 
@@ -500,33 +555,8 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
 
     if (decalInfo.m_atlasAllocationId.IsInvalidated())
     {
-      ezStringView sName;
-
-      if (decalInfo.m_hTexture.IsValid())
-      {
-        ezResourceLock<ezTexture2DResource> pTexture(decalInfo.m_hTexture, ezResourceAcquireMode::AllowLoadingFallback);
-        if (pTexture.GetAcquireResult() != ezResourceAcquireResult::Final || pTexture->GetNumQualityLevelsLoadable() > 0)
-          continue;
-
-        decalInfo.m_uiMaxWidth = ezMath::Clamp(pTexture->GetWidth(), s_uiMinDecalSize, s_uiMaxDecalSize);
-        decalInfo.m_uiMaxHeight = ezMath::Clamp(pTexture->GetHeight(), s_uiMinDecalSize, s_uiMaxDecalSize);
-        sName = DecalInfo::GetNameFromResource(*pTexture.GetPointer());
-      }
-      else
-      {
-        EZ_ASSERT_DEV(decalInfo.m_hMaterial.IsValid(), "DecalInfo must have either a texture or a material assigned.");
-
-        ezResourceLock<ezMaterialResource> pMaterial(decalInfo.m_hMaterial, ezResourceAcquireMode::AllowLoadingFallback);
-        if (pMaterial.GetAcquireResult() != ezResourceAcquireResult::Final)
-          continue;
-
-        sName = DecalInfo::GetNameFromResource(*pMaterial.GetPointer());
-      }
-
-      ezVec2U32 uiSize = decalInfo.CalculateScaledSize();
-
       ezRectU16 rect;
-      decalInfo.m_atlasAllocationId = s_pData->m_RuntimeAtlas.Allocate(uiSize.x, uiSize.y, sName, &rect);
+      decalInfo.m_atlasAllocationId = s_pData->m_RuntimeAtlas.Allocate(decalToUpdate.m_vNewSize.x, decalToUpdate.m_vNewSize.y, decalInfo.m_sName, &rect);
 
       auto data = pAtlasDataBuffer->MapForWriting<ezPerDecalAtlasData>(decalInfo.m_uiAtlasDataOffset);
       data[0] = MakeAtlasData(rect, vAtlasSize);
@@ -536,18 +566,6 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
     updateInfo.m_hMaterial = decalInfo.m_hMaterial;
     updateInfo.m_TargetRect = s_pData->m_RuntimeAtlas.GetAllocationRect(decalInfo.m_atlasAllocationId);
     updateInfo.m_WorldTime = decalInfo.m_WorldTime;
-
-    // Reset data
-    decalInfo.m_NextUpdateTime = ezTime::Now() + ezTime::MakeFromSeconds(decalInfo.m_fUpdateInterval);
-    decalInfo.m_fUpdateInterval = ezTime::MakeFromHours(3600).AsFloatInSeconds();
-    decalInfo.m_fMaxScreenSpaceSize = 0.0f;
-
-    if (decalInfo.m_hTexture.IsValid() == false)
-    {
-      decalInfo.m_uiMaxWidth = 0;
-      decalInfo.m_uiMaxHeight = 0;
-      decalInfo.m_WorldTime = ezTime::MakeZero();
-    }
   }
 
   s_pData->m_SortedDecals.Clear();
@@ -613,7 +631,7 @@ void ezDecalManager::OnRenderEvent(const ezRenderWorldRenderEvent& e)
       pRenderContext->SetGlobalAndWorldTimeConstants(updateInfo.m_WorldTime);
       pRenderContext->BindMaterial(updateInfo.m_hMaterial);
 
-      pRenderContext->DrawMeshBuffer().IgnoreResult();
+      pRenderContext->DrawMeshBuffer().AssertSuccess();
     }
 
     pRenderContext->EndRendering();
