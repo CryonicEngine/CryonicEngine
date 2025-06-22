@@ -176,25 +176,18 @@ ezResult ezShaderResourceBinding::CreateMergedShaderResourceBinding(const ezArra
       }
     }
   }
+  out_bindings.Sort([](const ezShaderResourceBinding& lhs, const ezShaderResourceBinding& rhs)
+    {
+    if (lhs.m_iSet != rhs.m_iSet)
+      return lhs.m_iSet < rhs.m_iSet;
+
+    return lhs.m_iSlot < rhs.m_iSlot; });
   return EZ_SUCCESS;
 }
 
 ezGALShaderByteCode::ezGALShaderByteCode() = default;
 
-ezGALShaderByteCode::~ezGALShaderByteCode()
-{
-  for (auto& binding : m_ShaderResourceBindings)
-  {
-    if (binding.m_pLayout != nullptr)
-    {
-      ezShaderConstantBufferLayout* pLayout = binding.m_pLayout;
-      binding.m_pLayout = nullptr;
-
-      if (pLayout->GetRefCount() == 0)
-        EZ_DEFAULT_DELETE(pLayout);
-    }
-  }
-}
+ezGALShaderByteCode::~ezGALShaderByteCode() = default;
 
 bool ezShaderConstantBufferLayout::operator==(const ezShaderConstantBufferLayout& rhs) const
 {
