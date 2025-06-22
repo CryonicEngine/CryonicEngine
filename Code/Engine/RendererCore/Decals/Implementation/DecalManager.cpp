@@ -328,11 +328,12 @@ ezDecalId ezDecalManager::GetOrCreateRuntimeDecal(const ezTexture2DResourceHandl
   {
     auto pAtlasDataBuffer = ezGALDevice::GetDefaultDevice()->GetDynamicBuffer(s_pData->m_hAtlasDataBuffer);
     uiIndex = pAtlasDataBuffer->Allocate(0, 1, ezGALDynamicBuffer::AllocateFlags::ZeroFill);
+    EZ_ASSERT_DEV(uiIndex < ezSmallInvalidIndex, "Too many decals");
 
     s_pData->m_DecalInfos.EnsureCount(uiIndex + 1);
 
     auto& decalInfo = s_pData->m_DecalInfos[uiIndex];
-    decalInfo.m_uiAtlasDataOffset = uiIndex;
+    decalInfo.m_uiAtlasDataOffset = static_cast<ezUInt16>(uiIndex);
     decalInfo.m_hTexture = hTexture;
     decalInfo.SetUpdateInterval(ezTime::MakeFromSeconds(0.1));
 
@@ -371,11 +372,12 @@ ezDecalId ezDecalManager::GetOrCreateRuntimeDecal(const ezMaterialResourceHandle
   {
     auto pAtlasDataBuffer = ezGALDevice::GetDefaultDevice()->GetDynamicBuffer(s_pData->m_hAtlasDataBuffer);
     uiIndex = pAtlasDataBuffer->Allocate(0, 1, ezGALDynamicBuffer::AllocateFlags::ZeroFill);
+    EZ_ASSERT_DEV(uiIndex < ezSmallInvalidIndex, "Too many decals");
 
     s_pData->m_DecalInfos.EnsureCount(uiIndex + 1);
 
     auto& decalInfo = s_pData->m_DecalInfos[uiIndex];
-    decalInfo.m_uiAtlasDataOffset = uiIndex;
+    decalInfo.m_uiAtlasDataOffset = static_cast<ezUInt16>(uiIndex);
     decalInfo.m_hMaterial = hMaterial;
   }
 
@@ -517,7 +519,7 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
 
     for (auto& decalInfo : s_pData->m_DecalInfos)
     {
-      if (decalInfo.m_uiAtlasDataOffset == ezInvalidIndex || decalInfo.m_sName.IsEmpty())
+      if (decalInfo.m_uiAtlasDataOffset == ezSmallInvalidIndex || decalInfo.m_sName.IsEmpty())
         continue;
 
       if (decalInfo.m_NextUpdateTime > now)
