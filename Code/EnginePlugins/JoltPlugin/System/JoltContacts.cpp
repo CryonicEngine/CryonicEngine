@@ -154,9 +154,9 @@ bool ezJoltContactListener::ActivateTrigger(const JPH::Body& body1, const JPH::B
 
   if (pTrigger && pComponent)
   {
-    pTrigger->PostTriggerMessage(pComponent->GetOwner()->GetHandle(), ezTriggerState::Activated);
-
     EZ_LOCK(m_TriggerMutex);
+
+    pTrigger->PostTriggerMessage(pComponent->GetOwner()->GetHandle(), ezTriggerState::Activated);
 
     const ezUInt64 uiStoreID = (uiBody1id < uiBody2id) ? (uiBody1id << 32 | uiBody2id) : (uiBody2id << 32 | uiBody1id);
     auto& trig = m_Trigs[uiStoreID];
