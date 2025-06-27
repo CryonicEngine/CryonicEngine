@@ -12,9 +12,11 @@ namespace
   }
 } // namespace
 
-ezGALProxyTexture::ezGALProxyTexture(const ezGALTexture& parentTexture)
+ezGALProxyTexture::ezGALProxyTexture(ezGALTextureHandle hParentTexture, const ezGALTexture& parentTexture, ezUInt16 uiSlice)
   : ezGALTexture(MakeProxyDesc(parentTexture.GetDescription()))
+  , m_hParentTexture(hParentTexture)
   , m_pParentTexture(&parentTexture)
+  , m_uiSlice(uiSlice)
 {
 }
 

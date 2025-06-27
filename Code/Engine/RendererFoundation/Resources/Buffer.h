@@ -8,6 +8,7 @@ class EZ_RENDERERFOUNDATION_DLL ezGALBuffer : public ezGALResource<ezGALBufferCr
 {
 public:
   EZ_ALWAYS_INLINE ezUInt32 GetSize() const;
+  EZ_ALWAYS_INLINE ezGALBufferRange ClampRange(ezGALBufferRange range) const;
 
 protected:
   friend class ezGALDevice;
@@ -17,13 +18,6 @@ protected:
 
   virtual ezResult InitPlatform(ezGALDevice* pDevice, ezArrayPtr<const ezUInt8> pInitialData) = 0;
   virtual ezResult DeInitPlatform(ezGALDevice* pDevice) = 0;
-
-protected:
-  ezGALBufferResourceViewHandle m_hDefaultTexelBufferView;
-  ezGALBufferResourceViewHandle m_hDefaultStructuredBufferView;
-  ezGALBufferResourceViewHandle m_hDefaultByteAddressBufferView;
-  ezHashTable<ezUInt32, ezGALBufferResourceViewHandle> m_ResourceViews;
-  ezHashTable<ezUInt32, ezGALBufferUnorderedAccessViewHandle> m_UnorderedAccessViews;
 };
 
 #include <RendererFoundation/Resources/Implementation/Buffer_inl.h>

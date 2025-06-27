@@ -7,6 +7,7 @@
 
 struct ezGALRenderingSetup;
 struct ezGALDeviceEvent;
+struct ezGALBindGroupCreationDescription;
 
 class EZ_RENDERERFOUNDATION_DLL ezGALCommandEncoder
 {
@@ -18,14 +19,33 @@ public:
 
   // State setting functions
 
-  void SetConstantBuffer(const ezShaderResourceBinding& binding, ezGALBufferHandle hBuffer);
-  void SetSamplerState(const ezShaderResourceBinding& binding, ezGALSamplerStateHandle hSamplerState);
-  void SetResourceView(const ezShaderResourceBinding& binding, ezGALTextureResourceViewHandle hResourceView);
-  void SetResourceView(const ezShaderResourceBinding& binding, ezGALBufferResourceViewHandle hResourceView);
-  void SetUnorderedAccessView(const ezShaderResourceBinding& binding, ezGALTextureUnorderedAccessViewHandle hUnorderedAccessView);
-  void SetUnorderedAccessView(const ezShaderResourceBinding& binding, ezGALBufferUnorderedAccessViewHandle hUnorderedAccessView);
+  /// \brief Sets a bind group to the given bind group index. Preferably, bindGroup should be created via ezBindGroupBuilder::CreateBindGroup.
+  ///
+  /// This function binds a collection of resources (buffers, textures, samplers) to a specific bind group index. In debug builds, it performs extensive validation of each ezGALBindGroupItem against the layout's ezShaderResourceBinding to ensure:
+  ///
+  /// **General Validation:**
+  /// - Bind group layout matches the number of provided items
+  /// - All resource handles are valid (non-null)
+  ///
+  /// **Buffer Validation:**
+  /// - Buffer handles are valid and match expected binding types
+  /// - Constant buffers: No texel format override, zero offset, full buffer size
+  /// - Structured/Texel/ByteAddress buffers: Proper usage flags, correct element alignment
+  /// - Buffer ranges: Offset/size alignment with element boundaries, bounds checking
+  /// - Access permissions: SRV/UAV flags match buffer usage flags
+  ///
+  /// **Texture Validation:**
+  /// - Texture handles are valid with proper view format compatibility
+  /// - Array slice counts match binding requirements (e.g. 1 for non-arrays, multiple of 6 for cubes)
+  /// - MSAA sample counts match between texture and binding
+  /// - Access permissions: SRV/UAV flags match texture capabilities
+  /// - Texture ranges: Mip levels and array slices within bounds
+  /// - Make sure no proxy texture is present
+  ///
+  /// \param uiBindGroup The bind group slot index to set
+  /// \param bindGroup Description containing the layout and resource items to bind
+  void SetBindGroup(ezUInt32 uiBindGroup, const ezGALBindGroupCreationDescription& bindGroup);
   void SetPushConstants(ezArrayPtr<const ezUInt8> data);
-
 
   // GPU -> CPU query functions
 
@@ -54,14 +74,6 @@ public:
 
   // Update functions
 
-  /// Clears an unordered access view with a float value.
-  void ClearUnorderedAccessView(ezGALTextureUnorderedAccessViewHandle hUnorderedAccessView, ezVec4 vClearValues);
-  void ClearUnorderedAccessView(ezGALBufferUnorderedAccessViewHandle hUnorderedAccessView, ezVec4 vClearValues);
-
-  /// Clears an unordered access view with an int value.
-  void ClearUnorderedAccessView(ezGALTextureUnorderedAccessViewHandle hUnorderedAccessView, ezVec4U32 vClearValues);
-  void ClearUnorderedAccessView(ezGALBufferUnorderedAccessViewHandle hUnorderedAccessView, ezVec4U32 vClearValues);
-
   void CopyBuffer(ezGALBufferHandle hDest, ezGALBufferHandle hSource);
   void CopyBufferRegion(ezGALBufferHandle hDest, ezUInt32 uiDestOffset, ezGALBufferHandle hSource, ezUInt32 uiSourceOffset, ezUInt32 uiByteCount);
 
@@ -77,7 +89,7 @@ public:
   void ReadbackTexture(ezGALReadbackTextureHandle hDestination, ezGALTextureHandle hSource);
   void ReadbackBuffer(ezGALReadbackBufferHandle hDestination, ezGALBufferHandle hSource);
 
-  void GenerateMipMaps(ezGALTextureResourceViewHandle hResourceView);
+  void GenerateMipMaps(ezGALTextureHandle hTexture, ezGALTextureRange range);
 
   // Misc
 
