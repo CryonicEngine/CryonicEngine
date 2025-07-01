@@ -818,6 +818,7 @@ ezComponent@ ezWindVolumeSphereComponent::opImplCast()
 ezComponentHandle ezBlackboardComponent::GetEntryValue_asComponentHandle(ezString Name) const
 ezComponentHandle ezCVar::GetValue_asComponentHandle(ezStringView Name)
 ezComponentHandle ezComponent::GetHandle() const
+ezComponentHandle ezMsgPhysicCharacterContact::get_Character() const
 ezComponentHandle ezScriptComponent::GetScriptVariable_asComponentHandle(ezHashedString Name) const
 ezComponentHandle ezVolumeComponent::GetValue_asComponentHandle(ezTempHashedString Name) const
 ezCreatureCrawlComponent@ ezComponent::opCast()
@@ -2870,6 +2871,7 @@ void ezMsgMoveCharacterController::set_StrafeRight(double)
 void ezMsgObjectGrabbed::set_GotGrabbed(bool)
 void ezMsgObjectGrabbed::set_GrabbedBy(ezGameObjectHandle)
 void ezMsgOnlyApplyToObject::set_Object(ezGameObjectHandle)
+void ezMsgPhysicCharacterContact::set_Character(ezComponentHandle)
 void ezMsgPhysicCharacterContact::set_CharacterVelocity(ezVec3)
 void ezMsgPhysicCharacterContact::set_GlobalPosition(ezVec3)
 void ezMsgPhysicCharacterContact::set_Impact(float)

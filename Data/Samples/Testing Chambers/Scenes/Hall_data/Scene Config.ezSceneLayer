@@ -11,7 +11,7 @@ o
 		s %AssetType{"Layer"}
 		VarArray %Dependencies{}
 		Uuid %DocumentID{u4{4025706763557391268,5561767617844493014}}
-		u4 %Hash{6889541833314523547}
+		u4 %Hash{8974483691524073322}
 		VarArray %MetaInfo{}
 		VarArray %Outputs{}
 		VarArray %PackageDeps
@@ -68,6 +68,45 @@ o
 		}
 		s %GlobalKey{""}
 		Vec3 %LocalPosition{f{0xCDCCCC41,0x9A997940,0x31335340}}
+		Quat %LocalRotation{f{0,0,0,0x0000803F}}
+		Vec3 %LocalScaling{f{0x0000803F,0x0000803F,0x0000803F}}
+		f %LocalUniformScaling{0x0000803F}
+		s %Mode{"ezObjectMode::Automatic"}
+		s %Name{""}
+		VarArray %Tags
+		{
+			s{"CastShadow"}
+		}
+	}
+}
+o
+{
+	Uuid %id{u4{15727487962181915835,4698518665208483937}}
+	s %t{"ezSimpleWindComponent"}
+	u3 %v{2}
+	p
+	{
+		b %Active{1}
+		Angle %MaxDeviation{f{0xDB0FC93F}}
+		s %MaxWindStrength{"ezWindStrength::LightBreeze"}
+		s %MinWindStrength{"ezWindStrength::Calm"}
+	}
+}
+o
+{
+	Uuid %id{u4{572970864050651792,4925155376999916188}}
+	s %t{"ezGameObject"}
+	u3 %v{1}
+	p
+	{
+		b %Active{1}
+		VarArray %Children{}
+		VarArray %Components
+		{
+			Uuid{u4{15727487962181915835,4698518665208483937}}
+		}
+		s %GlobalKey{""}
+		Vec3 %LocalPosition{f{0,0,0}}
 		Quat %LocalRotation{f{0,0,0,0x0000803F}}
 		Vec3 %LocalScaling{f{0x0000803F,0x0000803F,0x0000803F}}
 		f %LocalUniformScaling{0x0000803F}
@@ -154,6 +193,7 @@ o
 			Uuid{u4{14499727624278828394,10811930721449681700}}
 			Uuid{u4{12178472959436676850,15999438527909144964}}
 			Uuid{u4{2444098776383116711,3309806330080898796}}
+			Uuid{u4{572970864050651792,4925155376999916188}}
 		}
 		Uuid %Settings{u4{11260814291078938826,5289091215396086446}}
 	}
@@ -690,6 +730,23 @@ o
 }
 o
 {
+	Uuid %id{u4{15277032590044703488,7884827235263359982}}
+	s %t{"ezReflectedTypeDescriptor"}
+	u3 %v{1}
+	p
+	{
+		VarArray %Attributes{}
+		s %Flags{"ezTypeFlags::IsEnum|ezTypeFlags::Minimal"}
+		VarArray %Functions{}
+		s %ParentTypeName{"ezEnumBase"}
+		s %PluginName{"Static"}
+		VarArray %Properties{}
+		s %TypeName{"ezWindStrength"}
+		u3 %TypeVersion{1}
+	}
+}
+o
+{
 	Uuid %id{u4{8781371220448777178,8391987746845008996}}
 	s %t{"ezReflectedTypeDescriptor"}
 	u3 %v{1}
@@ -703,6 +760,23 @@ o
 		VarArray %Properties{}
 		s %TypeName{"ezSkyBoxComponent"}
 		u3 %TypeVersion{4}
+	}
+}
+o
+{
+	Uuid %id{u4{9941764884638810502,8668738566769915430}}
+	s %t{"ezReflectedTypeDescriptor"}
+	u3 %v{1}
+	p
+	{
+		VarArray %Attributes{}
+		s %Flags{"ezTypeFlags::Class|ezTypeFlags::Minimal"}
+		VarArray %Functions{}
+		s %ParentTypeName{"ezComponent"}
+		s %PluginName{"Static"}
+		VarArray %Properties{}
+		s %TypeName{"ezSimpleWindComponent"}
+		u3 %TypeVersion{2}
 	}
 }
 o

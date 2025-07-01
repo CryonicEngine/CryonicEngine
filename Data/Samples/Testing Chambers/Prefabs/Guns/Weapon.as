@@ -97,6 +97,7 @@ abstract class WeaponBaseClass : ezAngelScriptClass
             ezParticleComponent@ particleComp;
             if (node.TryGetComponentOfBaseType(@particleComp))
             {
+                particleComp.InterruptEffect();
                 particleComp.StartEffect();
             }
         }

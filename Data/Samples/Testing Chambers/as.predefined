@@ -2928,6 +2928,7 @@ class ezMsgPhysicsAddImpulse : ezMessage
 
 class ezMsgPhysicCharacterContact : ezMessage
 {
+  ezComponentHandle Character;
   ezVec3 GlobalPosition;
   ezVec3 Normal;
   ezVec3 CharacterVelocity;

@@ -66,6 +66,7 @@ CenterOfMass
 CenterPosition
 CenterVelocity
 ChangeNotificationMsg
+Character
 CharacterGravity
 CharacterVelocity
 Chartreuse
