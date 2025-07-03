@@ -92,6 +92,10 @@ ezQtContainerWindow::ezQtContainerWindow()
     ads::CDockManager::OpaqueSplitterResize;
   ads::CDockManager::setConfigFlags(flags);
 
+  ads::CDockManager::setAutoHideConfigFlags(ads::CDockManager::DefaultAutoHideConfig);
+  ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideShowOnMouseOver, false);
+  ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideCloseOnOutsideMouseClick, false);
+
   m_pDockManager = new ads::CDockManager(this);
 
   connect(m_pDockManager, &ads::CDockManager::floatingWidgetCreated, this, &ezQtContainerWindow::SlotFloatingWidgetOpened);
@@ -278,8 +282,9 @@ void ezQtContainerWindow::RestoreWindowLayout()
     Settings.endGroup();
   }
 
-  for (ezUInt32 i = 0; i < m_DocumentWindows.GetCount(); ++i)
-    m_DocumentWindows[i]->RestoreWindowLayout(true);
+  // do NOT restore the layouts of the document windows here
+  // the window may be too small at this time, and the layout restoration may thus resize the document widgets to the bare minimum
+  // and destroy the layout
 
   m_bWindowLayoutRestored = true;
 }
@@ -402,11 +407,15 @@ void ezQtContainerWindow::AddDocumentWindow(ezQtDocumentWindow* pDocWindow)
   // the base class implementation, NOT the derived one !
   // therefore, we do some stuff in ezQtContainerWindow::UpdateWindowDecoration() instead
 
+  pDocWindow->m_pContainerWindow = this;
+
   m_DocumentWindows.PushBack(pDocWindow);
   ezString displayName = pDocWindow->GetDisplayNameShort();
   ads::CDockWidget* dock = new ads::CDockWidget(m_pDockManager, QString::fromUtf8(displayName.GetData(), displayName.GetElementCount()));
   dock->installEventFilter(pDocWindow);
+
   dock->setFeature(ads::CDockWidget::CustomCloseHandling, true);
+  dock->setFeature(ads::CDockWidget::DockWidgetPinnable, false);
 
   dock->setObjectName(pDocWindow->GetUniqueName());
   EZ_ASSERT_DEV(!dock->objectName().isEmpty(), "Dock name must not be empty.");
