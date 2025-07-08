@@ -169,7 +169,6 @@ struct DecalInfo
     m_fMaxScreenSpaceSize = 0.0f;
 
     m_NextUpdateTime = ezTime::Now() + ezTime::MakeFromSeconds(m_fUpdateInterval);
-    m_WorldTime = ezTime::MakeZero();
   }
 
   EZ_ALWAYS_INLINE static ezUInt64 GetKey(const ezTexture2DResourceHandle& hTexture)
@@ -568,6 +567,8 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
     updateInfo.m_hMaterial = decalInfo.m_hMaterial;
     updateInfo.m_TargetRect = s_pData->m_RuntimeAtlas.GetAllocationRect(decalInfo.m_atlasAllocationId);
     updateInfo.m_WorldTime = decalInfo.m_WorldTime;
+
+    decalInfo.m_WorldTime = ezTime::MakeZero();
   }
 
   s_pData->m_SortedDecals.Clear();
