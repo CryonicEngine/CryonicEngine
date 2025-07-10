@@ -6,6 +6,8 @@
 class ezDocument;
 struct ezDocumentObjectStructureEvent;
 
+
+/// \brief Event describing changes to the selection in the selection manager.
 struct ezSelectionManagerEvent
 {
   enum class Type
@@ -32,9 +34,10 @@ struct ezSelectionEntry
 class EZ_TOOLSFOUNDATION_DLL ezSelectionManager
 {
 public:
+  /// \brief Event that is broadcast when the selection changes.
   ezCopyOnBroadcastEvent<const ezSelectionManagerEvent&> m_Events;
 
-  // \brief Storage for the selection so it can be swapped when using multiple sub documents.
+  /// \brief Storage for the selection so it can be swapped when using multiple sub documents.
   class Storage : public ezRefCounted
   {
   public:

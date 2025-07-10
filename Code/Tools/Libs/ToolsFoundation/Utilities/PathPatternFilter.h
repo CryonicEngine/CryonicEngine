@@ -3,7 +3,7 @@
 #include <Foundation/Strings/String.h>
 #include <ToolsFoundation/ToolsFoundationDLL.h>
 
-/// \brief Describes a single path pattern.
+/// \brief Describes a single path pattern for filtering file paths.
 ///
 /// A path pattern is something like "*.jpg", "SubFolder/*" or "*/temp/*".
 /// It may start or end with a * indicating that it matches paths that start with, end with, or contain the pattern.
@@ -28,8 +28,7 @@ struct EZ_TOOLSFOUNDATION_DLL ezPathPattern
   bool Matches(const ezStringView sText) const;
 };
 
-/// \brief A collection of ezPathPatterns.
-///
+/// \brief A collection of ezPathPatterns for include/exclude filtering of file paths.
 struct EZ_TOOLSFOUNDATION_DLL ezPathPatternFilter
 {
   ezDynamicArray<ezPathPattern> m_ExcludePatterns;
@@ -45,7 +44,7 @@ struct EZ_TOOLSFOUNDATION_DLL ezPathPatternFilter
   /// following lines are considered as include patterns or exclude patterns.
   ezResult ReadConfigFile(ezStringView sFile, const ezDynamicArray<ezString>& preprocessorDefines);
 
-  /// \brief Adds a pattern.
+  /// \brief Adds a pattern as either an include or exclude filter.
   void AddFilter(ezStringView sText, bool bIncludeFilter);
 
   /// \brief Determines whether the given text matches the filter patterns.

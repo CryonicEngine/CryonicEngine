@@ -60,7 +60,6 @@ ezDocument::ezDocument(ezStringView sPath, ezDocumentObjectManager* pDocumentObj
 {
   using ObjectMetaData = ezObjectMetaData<ezUuid, ezDocumentObjectMetaData>;
   m_DocumentObjectMetaData = EZ_DEFAULT_NEW(ObjectMetaData);
-  m_pDocumentInfo = nullptr;
   m_sDocumentPath = sPath;
   m_pObjectManager = ezUniquePtr<ezDocumentObjectManager>(pDocumentObjectManagerImpl, ezFoundation::GetDefaultAllocator());
   m_pObjectManager->SetDocument(this);
@@ -71,13 +70,6 @@ ezDocument::ezDocument(ezStringView sPath, ezDocumentObjectManager* pDocumentObj
   {
     m_pObjectAccessor = EZ_DEFAULT_NEW(ezObjectCommandAccessor, m_pCommandHistory.Borrow());
   }
-
-  m_bWindowRequested = false;
-  m_bModified = true;
-  m_bReadOnly = false;
-  m_bAddToRecentFilesList = true;
-
-  m_uiUnknownObjectTypeInstances = 0;
 
   m_pHostDocument = this;
   m_pActiveSubDocument = this;
