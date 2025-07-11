@@ -99,6 +99,8 @@ ezMsgObjectGrabbed
 ezMsgOnlyApplyToObject
 ezMsgParentChanged
 ezMsgPathChanged
+ezMsgPhysicCharacterContact
+ezMsgPhysicContact
 ezMsgPhysicsAddImpulse
 ezMsgPhysicsJointBroke
 ezMsgQueryAnimationSkeleton

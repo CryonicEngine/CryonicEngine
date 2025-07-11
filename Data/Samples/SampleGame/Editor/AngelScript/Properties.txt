@@ -40,6 +40,8 @@ CadetBlue
 CameraRenderPipeline
 CaptureOffset
 CastShadows
+Character
+CharacterVelocity
 Chartreuse
 Chocolate
 Closed
@@ -48,6 +50,7 @@ CollisionLayer
 Color
 Comment
 ConstantBias
+Cookie
 Coral
 CornflowerBlue
 Cornsilk
@@ -151,7 +154,9 @@ HoneyDew
 HotPink
 ISO
 IgnoreOwnerRotation
+Impact
 ImpactDirection
+ImpactSqr
 Impulse
 IndianRed
 Indigo
@@ -213,7 +218,9 @@ MapNormalToGeometry
 Marker
 Maroon
 Material
+MaterialResolution
 MaterialSlot
+MaterialUpdateInterval
 MaxDeviation
 MaxDistance
 MaxRotationZ
@@ -254,6 +261,7 @@ NearPlane
 NearPlaneOffset
 NegativeFalloff
 NewStateName
+Normal
 NumCascades
 Object
 ObjectFilterID

@@ -292,6 +292,7 @@ enum ezPhysicsShapeType
   Ragdoll = 32,
   Rope = 64,
   Cloth = 128,
+  Debris = 256,
 }
 
 enum ezDebugTextHAlign
@@ -1164,6 +1165,8 @@ class ezWorld
 class ezMessage
 {
   ezMsgPhysicsAddImpulse@ opCast();
+  ezMsgPhysicCharacterContact@ opCast();
+  ezMsgPhysicContact@ opCast();
   ezMsgPhysicsJointBroke@ opCast();
   ezMsgObjectGrabbed@ opCast();
   ezMsgReleaseObjectGrab@ opCast();
@@ -1599,6 +1602,10 @@ class ezSpotLightComponent : ezLightComponent
   ezAngle InnerSpotAngle;
   ezAngle OuterSpotAngle;
   float ShadowFadeOutRange;
+  ezStringView Cookie;
+  ezStringView Material;
+  uint32 MaterialResolution;
+  ezTime MaterialUpdateInterval;
 }
 
 class ezCustomMeshComponent : ezRenderComponent
@@ -2149,6 +2156,22 @@ class ezMsgPhysicsAddImpulse : ezMessage
   ezVec3 GlobalPosition;
   ezVec3 Impulse;
   uint32 ObjectFilterID;
+}
+
+class ezMsgPhysicCharacterContact : ezMessage
+{
+  ezComponentHandle Character;
+  ezVec3 GlobalPosition;
+  ezVec3 Normal;
+  ezVec3 CharacterVelocity;
+  float Impact;
+}
+
+class ezMsgPhysicContact : ezMessage
+{
+  ezVec3 GlobalPosition;
+  ezVec3 Normal;
+  float ImpactSqr;
 }
 
 class ezEventMessage : ezMessage

@@ -327,5 +327,10 @@ void ezQtCreateProjectDlg::CreateProject()
     {
       // TODO
     }
+
+    // make sure, that in case we copied an AssetCache, it gets deleted
+    // so that the project definitely starts fresh
+    ezStringBuilder sAssetCache(sFullPath, "/AssetCache");
+    ezOSFile::DeleteFolder(sAssetCache);
   }
 }
