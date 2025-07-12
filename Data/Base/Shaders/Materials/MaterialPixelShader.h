@@ -89,10 +89,9 @@ PS_OUT main(PS_IN Input)
 
   ezMaterialData matData = FillMaterialData();
 
+  uint gameObjectId = GetInstanceData().GameObjectID;
 #if SHADING_QUALITY == SHADING_QUALITY_NORMAL
   ezPerClusterData clusterData = GetClusterData(Input.Position.xyw);
-  uint gameObjectId = GetInstanceData().GameObjectID;
-
 #  if defined(USE_DECALS)
   ApplyDecals(matData, clusterData, gameObjectId);
 #  endif

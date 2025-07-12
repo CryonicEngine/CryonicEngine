@@ -10,6 +10,7 @@ SHADING_QUALITY = SHADING_QUALITY_NORMAL
 TWO_SIDED = FALSE
 FLIP_WINDING
 FORWARD_PASS_WRITE_DEPTH
+VERTEX_SHADER_RENDER_TARGET_ARRAY_INDEX
 MSAA
 CAMERA_MODE
 
@@ -63,7 +64,6 @@ float GetVertexDepthBias()
 VS_OUT main(VS_IN Input)
 {
   VS_OUT Output = FillVertexData(Input);
-
   Output.TexCoordAlpha = Output.TexCoord0;
 
   // First determine the slot index based on the integer part of the UVs.
