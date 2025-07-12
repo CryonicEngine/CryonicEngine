@@ -262,7 +262,7 @@ ezRectU16 ezDynamicTextureAtlas::GetAllocationRect(AllocationId id) const
     return pNode->m_Rect;
   }
 
-  return ezRectU16();
+  return ezRectU16::MakeZero();
 }
 
 void ezDynamicTextureAtlas::DebugDraw(const ezDebugRendererContext& debugContext, float fViewWidth, float fViewHeight, bool bBlackOutFreeAreas /*= true*/) const

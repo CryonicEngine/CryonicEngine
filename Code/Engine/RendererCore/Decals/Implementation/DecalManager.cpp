@@ -532,7 +532,7 @@ void ezDecalManager::OnExtractionEvent(const ezRenderWorldExtractionEvent& e)
         s_pData->m_RuntimeAtlas.Deallocate(decalInfo.m_atlasAllocationId);
       }
 
-      if ((decalInfo.IsDynamic() || bSizeChanged) && newSize.IsZero() == false)
+      if ((decalInfo.IsDynamic() || bSizeChanged) && newSize.x > 0 && newSize.y > 0)
       {
         auto& sortedDecal = s_pData->m_SortedDecals.ExpandAndGetRef();
         sortedDecal.m_uiIndex = decalInfo.m_uiAtlasDataOffset;
