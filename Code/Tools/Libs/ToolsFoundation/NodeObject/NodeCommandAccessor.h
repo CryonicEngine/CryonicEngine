@@ -3,6 +3,8 @@
 
 class EZ_TOOLSFOUNDATION_DLL ezNodeCommandAccessor : public ezObjectCommandAccessor
 {
+  EZ_ADD_DYNAMIC_REFLECTION(ezNodeCommandAccessor, ezObjectCommandAccessor);
+
 public:
   ezNodeCommandAccessor(ezCommandHistory* pHistory);
   ~ezNodeCommandAccessor();
