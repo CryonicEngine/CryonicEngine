@@ -393,7 +393,7 @@ void eqQtAssetBrowserFolderView::DeleteFolder()
     QModelIndex id = indexFromItem(pCurrentItem);
     QString sQtAbsPath = id.data(ezQtAssetBrowserModel::UserRoles::AbsolutePath).toString();
     ezString sAbsPath = qtToEzString(sQtAbsPath);
-    QMessageBox::StandardButton choice = ezQtUiServices::MessageBoxQuestion(ezFmt("Do you want to delete the folder\n'{}'?", sAbsPath), QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::Yes);
+    QMessageBox::StandardButton choice = ezQtUiServices::MessageBoxQuestion(ezFmt("Do you want to delete the folder\n'{}'?", sAbsPath), QMessageBox::StandardButton::Cancel | QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::Cancel);
     if (choice == QMessageBox::StandardButton::Cancel)
       return;
 

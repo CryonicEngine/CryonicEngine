@@ -190,5 +190,5 @@ void ezMeshImportDlg::on_ReuseSkeleton_clicked(bool)
 
 void ezMeshImportDlg::on_Help_clicked(bool)
 {
-  QDesktopServices::openUrl(QUrl("https://ezengine.net/pages/docs/assets/import-assets.html"));
+  QDesktopServices::openUrl(QUrl("https://ezengine.net/pages/docs/graphics/meshes/mesh-import.html"));
 }
