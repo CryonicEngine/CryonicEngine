@@ -21,6 +21,8 @@ namespace JPH
   class Ragdoll;
   class RagdollSettings;
   class Shape;
+  class SkeletonPose;
+  class PhysicsSystem;
 } // namespace JPH
 
 using ezSkeletonResourceHandle = ezTypedResourceHandle<class ezSkeletonResource>;
