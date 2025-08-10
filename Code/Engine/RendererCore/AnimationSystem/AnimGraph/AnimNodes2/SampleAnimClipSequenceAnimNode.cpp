@@ -406,6 +406,9 @@ void ezSampleAnimClipSequenceAnimNode::Step(ezAnimController& ref_controller, ez
   if (pState->m_State >= State::HoldStartFrame)
   {
     cmd.m_EventSampling = ezAnimPoseEventTrackSampleMode::None;
+
+    cmd.m_fPreviousNormalizedSamplePos = 1.0f;
+    cmd.m_fNormalizedSamplePos = 1.0f;
   }
   else
   {
