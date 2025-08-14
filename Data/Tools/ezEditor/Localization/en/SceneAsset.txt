@@ -19,6 +19,7 @@ ezCameraComponent;Camera;;https://ezengine.net/pages/docs/graphics/camera-compon
 ezClothSheetComponent;Cloth Sheet;;http://ezengine.net/pages/docs/effects/cloth-sheet-component.html
 ezColorAnimationComponent;Color Animation;;https://ezengine.net/pages/docs/animation/property-animation/color-animation-component.html
 ezCommentComponent;Comment;;https://ezengine.net/pages/docs/Miscellaneous/components/comment-component.html
+ezCustomMeshComponent;Custom Mesh;;https://ezengine.net/pages/docs/graphics/meshes/custom-mesh-component.html
 ezDebugTextComponent;Debug Text;;https://ezengine.net/pages/docs/debugging/components/debug-text-component.html
 ezDirectionalLightComponent;Directional Light;;https://ezengine.net/pages/docs/graphics/lighting/directional-light-component.html
 ezFakeRopeComponent;Fake Rope Simulation;;https://ezengine.net/pages/docs/effects/ropes/fake-rope-component.html

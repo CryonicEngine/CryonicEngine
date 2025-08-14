@@ -113,6 +113,9 @@ void ezInputComponent::Update()
 
 float ezInputComponent::GetCurrentInputState(const char* szInputAction, bool bOnlyKeyPressed /*= false*/) const
 {
+  if (!IsActiveAndSimulating())
+    return 0;
+
   if (m_sInputSet.IsEmpty())
     return 0;
 
