@@ -8,6 +8,10 @@ bool T[]::opEquals(const T[]&in) const
 bool ezAiNavMeshPathTestComponent::get_VisualizePathCorridor() const
 bool ezAiNavMeshPathTestComponent::get_VisualizePathLine() const
 bool ezAiNavMeshPathTestComponent::get_VisualizePathState() const
+bool ezAiNavigationComponent::EnsureNavMeshSectorAvailable(ezVec3 vCenter, float fRadius)
+bool ezAiNavigationComponent::FindRandomPointAroundCircle(ezVec3 vCenter, float fRadius, ezVec3&out out_vPoint)
+bool ezAiNavigationComponent::RaycastNavMesh(ezVec3 vStart, ezVec3 vDirection, float fDistance, ezVec3&out out_vPoint, float&out out_fDistance)
+bool ezAiNavigationComponent::get_ApplySteering() const
 bool ezAimIKComponent::get_InversePoleVector() const
 bool ezAngle::IsEqualNormalized(ezAngle rhs, ezAngle epsilon) const
 bool ezAngle::IsEqualSimple(ezAngle rhs, ezAngle epsilon) const
@@ -142,10 +146,10 @@ bool ezParticleComponent::get_IgnoreOwnerRotation() const
 bool ezParticleComponent::get_SpawnAtStart() const
 bool ezPathComponent::get_Closed() const
 bool ezPhysics::OverlapTestCapsule(float Radius, float Height, ezTransform Transform, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
-bool ezPhysics::OverlapTestLine(ezVec3 Start, ezVec3 End, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 4294967295)
+bool ezPhysics::OverlapTestLine(ezVec3 Start, ezVec3 End, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 18446744073709551615)
 bool ezPhysics::OverlapTestSphere(float Radius, ezVec3 Position, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
-bool ezPhysics::Raycast(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, ezVec3 Start, ezVec3 Direction, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 4294967295)
-bool ezPhysics::RaycastSurfaceInteraction(ezVec3 RayStart, ezVec3 RayDirection, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes, ezStringView FallbackSurface, ezTempHashedString Interaction, float Impulse = 0, uint IgnoreObjectID = 4294967295)
+bool ezPhysics::Raycast(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, ezVec3 Start, ezVec3 Direction, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3), uint IgnoreObjectID = 18446744073709551615)
+bool ezPhysics::RaycastSurfaceInteraction(ezVec3 RayStart, ezVec3 RayDirection, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes, ezStringView FallbackSurface, ezTempHashedString Interaction, float Impulse = 0, uint IgnoreObjectID = 18446744073709551615)
 bool ezPhysics::SweepTestCapsule(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, float Height, ezTransform Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
 bool ezPhysics::SweepTestSphere(ezVec3&out HitPosition, ezVec3&out HitNormal, ezGameObjectHandle&out HitObject, float Radius, ezVec3 Start, ezVec3 Direction, float Distance, uint8 CollisionLayer, ezPhysicsShapeType ShapeTypes = ezPhysicsShapeType(3))
 bool ezPowerConnectorComponent::IsAttached() const
@@ -342,6 +346,7 @@ ezAlwaysVisibleComponent@ ezComponent::opCast()
 ezAlwaysVisibleComponent@ ezRenderComponent::opCast()
 ezAmbientLightComponent@ ezComponent::opCast()
 ezAmbientLightComponent@ ezSettingsComponent::opCast()
+ezAngle ezAiNavigationComponent::GetTurnAngleTowards(ezVec2 TargetPosition) const
 ezAngle ezAngle::AngleBetween(ezAngle a1, ezAngle a2)
 ezAngle ezAngle::GetNormalizedRange() const
 ezAngle ezAngle::MakeFromDegree(float fDegree)
@@ -891,6 +896,7 @@ ezGameObjectHandle ezMsgPhysicsJointBroke::get_JointObject() const
 ezGameObjectHandle ezMsgReleaseObjectGrab::get_GrabbedObjectToRelease() const
 ezGameObjectHandle ezMsgTriggerTriggered::get_GameObject() const
 ezGameObjectHandle ezScriptComponent::GetScriptVariable_asGameObjectHandle(ezHashedString Name) const
+ezGameObjectHandle ezSensorComponent::GetDetectedObject(uint uiIndex) const
 ezGameObjectHandle ezVolumeComponent::GetValue_asGameObjectHandle(ezTempHashedString Name) const
 ezGameObjectHandle ezWorld::CreateObject(const ezGameObjectDesc&in desc)
 ezGameObjectHandle ezWorld::CreateObject(const ezGameObjectDesc&in desc, ezGameObject@&out object)
@@ -1020,6 +1026,11 @@ ezJoltPointConstraintComponent@ ezComponent::opCast()
 ezJoltPointConstraintComponent@ ezJoltConstraintComponent::opCast()
 ezJoltQueryShapeActorComponent@ ezComponent::opCast()
 ezJoltQueryShapeActorComponent@ ezJoltActorComponent::opCast()
+ezJoltRagdollAnimMode ezJoltRagdollComponent::get_AnimMode() const
+ezJoltRagdollAnimMode::Controlled
+ezJoltRagdollAnimMode::Limp
+ezJoltRagdollAnimMode::Off
+ezJoltRagdollAnimMode::Powered
 ezJoltRagdollComponent@ ezComponent::opCast()
 ezJoltRagdollStartMode ezJoltRagdollComponent::get_StartMode() const
 ezJoltRagdollStartMode::WithBindPose
@@ -1210,6 +1221,7 @@ ezObjectMsgQueueType::PostTransform
 ezOccluderComponent@ ezComponent::opCast()
 ezOccluderType ezOccluderComponent::get_Type() const
 ezOccluderType::Box
+ezOccluderType::Mesh
 ezOccluderType::QuadPosX
 ezOnComponentFinishedAction ezCameraShakeVolumeComponent::get_OnFinishedAction() const
 ezOnComponentFinishedAction ezDecalComponent::get_OnFinishedAction() const
@@ -1269,6 +1281,7 @@ ezPropertyAnimMode ezSimpleAnimationComponent::get_AnimationMode() const
 ezPropertyAnimMode::BackAndForth
 ezPropertyAnimMode::Loop
 ezPropertyAnimMode::Once
+ezQuat ezAiNavigationComponent::GetSteeringRotation() const
 ezQuat ezBlackboardComponent::GetEntryValue_asQuat(ezString Name) const
 ezQuat ezCVar::GetValue_asQuat(ezStringView Name)
 ezQuat ezGameObject::GetGlobalRotation() const
@@ -1493,6 +1506,7 @@ ezStringView ezJoltStaticActorComponent::get_Surface() const
 ezStringView ezJoltVisColMeshComponent::get_CollisionMesh() const
 ezStringView ezMeshComponent::get_Mesh() const
 ezStringView ezMsgSetMeshMaterial::get_Material() const
+ezStringView ezOccluderComponent::get_Mesh() const
 ezStringView ezParticleComponent::get_Effect() const
 ezStringView ezPlayerStartPointComponent::get_PlayerPrefab() const
 ezStringView ezPrefabReferenceComponent::get_Prefab() const
@@ -1658,6 +1672,7 @@ ezVec2 ezVec2::opSub(const ezVec2&in) const
 ezVec2 ezVec3::GetAsVec2() const
 ezVec2 ezVec4::GetAsVec2() const
 ezVec2 ezVolumeComponent::GetValue_asVec2(ezTempHashedString Name) const
+ezVec3 ezAiNavigationComponent::GetSteeringPosition() const
 ezVec3 ezBakedProbesComponent::get_TestPosition() const
 ezVec3 ezBakedProbesVolumeComponent::get_Extents() const
 ezVec3 ezBlackboardComponent::GetEntryValue_asVec3(ezString Name) const
@@ -1972,6 +1987,7 @@ float ezJoltGrabObjectComponent::get_SpringDamping() const
 float ezJoltGrabObjectComponent::get_SpringStiffness() const
 float ezJoltHingeConstraintComponent::get_DriveStrength() const
 float ezJoltHingeConstraintComponent::get_Friction() const
+float ezJoltRagdollComponent::GetJointMotorStrength() const
 float ezJoltRagdollComponent::get_CenterAngularVelocity() const
 float ezJoltRagdollComponent::get_CenterVelocity() const
 float ezJoltRagdollComponent::get_GravityFactor() const
@@ -2196,6 +2212,7 @@ uint ezRandom::UInt()
 uint ezRandom::UInt32Index(uint uiArraySize, uint uiFallbackValue = 0xFFFFFFFF)
 uint ezRandom::UIntInRange(uint uiRange)
 uint ezRopeRenderComponent::get_Detail() const
+uint ezSensorComponent::GetDetectedObjectsCount() const
 uint ezSpotLightComponent::get_MaterialResolution() const
 uint ezString::GetElementCount() const
 uint ezStringBuilder::GetCharacterCount() const
@@ -2203,6 +2220,7 @@ uint ezStringBuilder::GetElementCount() const
 uint ezStringBuilder::ReplaceAll(ezStringView sSearchFor, ezStringView sReplacement)
 uint ezStringBuilder::ReplaceAll_NoCase(ezStringView sSearchFor, ezStringView sReplacement)
 uint ezStringView::GetElementCount() const
+uint16 ezAimIKComponent::get_Order() const
 uint16 ezEventMsgSetPowerInput::get_NewValue() const
 uint16 ezEventMsgSetPowerInput::get_PrevValue() const
 uint16 ezFakeRopeComponent::get_Pieces() const
@@ -2214,6 +2232,7 @@ uint16 ezRandom::UInt16Index(uint16 uiArraySize, uint16 uiFallbackValue = 0xFFFF
 uint16 ezRandomPrefabComponent::get_Count() const
 uint16 ezSpawnBoxComponent::get_MinSpawnCount() const
 uint16 ezSpawnBoxComponent::get_SpawnCountRange() const
+uint16 ezTwoBoneIKComponent::get_Order() const
 uint64 ezParticleComponent::get_RandomSeed() const
 uint8 ezAreaDamageComponent::get_CollisionLayer() const
 uint8 ezAreaDamageComponent::get_ImpulseType() const
@@ -2260,6 +2279,7 @@ void ezAiNavigationComponent::SetDestination(ezVec3 Destination, bool AllowParti
 void ezAiNavigationComponent::StopWalking(float WithinDistance)
 void ezAiNavigationComponent::TurnTowards(ezVec2 TargetPosition)
 void ezAiNavigationComponent::set_Acceleration(float)
+void ezAiNavigationComponent::set_ApplySteering(bool)
 void ezAiNavigationComponent::set_CollisionLayer(uint)
 void ezAiNavigationComponent::set_DebugFlags(ezAiNavigationDebugFlags)
 void ezAiNavigationComponent::set_Deceleration(float)
@@ -2272,6 +2292,7 @@ void ezAiNavigationComponent::set_Speed(float)
 void ezAimIKComponent::set_DebugVisScale(float)
 void ezAimIKComponent::set_ForwardVector(ezBasisAxis)
 void ezAimIKComponent::set_InversePoleVector(bool)
+void ezAimIKComponent::set_Order(uint16)
 void ezAimIKComponent::set_UpVector(ezBasisAxis)
 void ezAimIKComponent::set_Weight(float)
 void ezAmbientLightComponent::set_BottomColor(ezColorGammaUB)
@@ -2284,6 +2305,7 @@ void ezAngle::opSubAssign(ezAngle)
 void ezAnimatedMeshComponent::set_Color(ezColor)
 void ezAnimatedMeshComponent::set_CustomData(ezVec4)
 void ezAnimatedMeshComponent::set_Mesh(ezStringView)
+void ezAnimationControllerComponent::SetAnimationClipOverride(ezStringView sAnimationName, ezStringView sAnimationClipResource)
 void ezAnimationControllerComponent::set_AnimGraph(ezStringView)
 void ezAnimationControllerComponent::set_EnableIK(bool)
 void ezAnimationControllerComponent::set_InvisibleUpdateRate(ezAnimationInvisibleUpdateRate)
@@ -2659,8 +2681,11 @@ void ezJoltHitboxComponent::set_QueryShapeOnly(bool)
 void ezJoltHitboxComponent::set_UpdateThreshold(ezTime)
 void ezJoltQueryShapeActorComponent::set_Surface(ezStringView)
 void ezJoltRagdollComponent::AddInitialImpulse(ezVec3 vWorldPosition, ezVec3 vWorldDirectionAndStrength)
+void ezJoltRagdollComponent::FadeJointMotorStrength(float fTargetStrength, ezTime tDuration)
 void ezJoltRagdollComponent::SetInitialImpulse(ezVec3 vWorldPosition, ezVec3 vWorldDirectionAndStrength)
-void ezJoltRagdollComponent::SetJointTypeOverride(ezStringView JointName, ezSkeletonJointType OverrideType)
+void ezJoltRagdollComponent::SetJointMotorStrength(float fStrength)
+void ezJoltRagdollComponent::SetJointTypeOverride(ezStringView sJointName, ezSkeletonJointType overrideType)
+void ezJoltRagdollComponent::set_AnimMode(ezJoltRagdollAnimMode)
 void ezJoltRagdollComponent::set_CenterAngularVelocity(float)
 void ezJoltRagdollComponent::set_CenterPosition(ezVec3)
 void ezJoltRagdollComponent::set_CenterVelocity(float)
@@ -2754,33 +2779,33 @@ void ezLodMeshComponent::set_CustomData(ezVec4)
 void ezLodMeshComponent::set_OverlapRanges(bool)
 void ezLodMeshComponent::set_ShowDebugInfo(bool)
 void ezLodMeshComponent::set_SortingDepthOffset(float)
-void ezLog::Error(ezStringView Text)
-void ezLog::Error(ezStringView Text, ?&in VarArg1)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
-void ezLog::Error(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
-void ezLog::Info(ezStringView Text)
-void ezLog::Info(ezStringView Text, ?&in VarArg1)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
-void ezLog::Info(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
-void ezLog::Warning(ezStringView Text)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
-void ezLog::Warning(ezStringView Text, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
+void ezLog::Error(ezStringView)
+void ezLog::Error(ezStringView, ?&in VarArg1)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
+void ezLog::Error(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
+void ezLog::Info(ezStringView)
+void ezLog::Info(ezStringView, ?&in VarArg1)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
+void ezLog::Info(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
+void ezLog::Warning(ezStringView)
+void ezLog::Warning(ezStringView, ?&in VarArg1)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7)
+void ezLog::Warning(ezStringView, ?&in VarArg1, ?&in VarArg2, ?&in VarArg3, ?&in VarArg4, ?&in VarArg5, ?&in VarArg6, ?&in VarArg7, ?&in VarArg8)
 void ezMarkerComponent::set_Radius(float)
 void ezMeshComponent::set_Color(ezColor)
 void ezMeshComponent::set_CustomData(ezVec4)
@@ -2847,6 +2872,7 @@ void ezMsgTriggerTriggered::set_Message(ezHashedString)
 void ezMsgTriggerTriggered::set_TriggerState(ezTriggerState)
 void ezNavMeshObstacleComponent::InvalidateSectors()
 void ezOccluderComponent::set_Extents(ezVec3)
+void ezOccluderComponent::set_Mesh(ezStringView)
 void ezOccluderComponent::set_Type(ezOccluderType)
 void ezParticleComponent::InterruptEffect()
 void ezParticleComponent::StopEffect()
@@ -2872,8 +2898,8 @@ void ezPowerConnectorComponent::Detach()
 void ezPowerConnectorComponent::set_Output(uint16)
 void ezPrefabReferenceComponent::set_Prefab(ezStringView)
 void ezPrefabReferenceComponent::set_ShowShapeIcons(bool)
-void ezPrefabs::SpawnPrefab(ezStringView Prefab, ezTransform GlobalTransform, ezVec3 RelativePos, ezQuat RelativeRotation)
-void ezPrefabs::SpawnPrefabAsChild(ezStringView Prefab, ezGameObject@ Parent, ezVec3 RelativePos, ezQuat RelativeRotation)
+void ezPrefabs::SpawnPrefab(ezStringView Prefab, ezTransform GlobalTransform, uint UniqueID = 4294967295, bool SetCreatedByPrefab = true, bool SetHideShapeIcon = true)
+void ezPrefabs::SpawnPrefabAsChild(ezStringView Prefab, ezGameObject@ Parent, ezTransform LocalTransform, uint UniqueID = 4294967295, bool SetCreatedByPrefab = true, bool SetHideShapeIcon = true)
 void ezProjectileComponent::set_CollisionLayer(uint8)
 void ezProjectileComponent::set_FallbackSurface(ezStringView)
 void ezProjectileComponent::set_GravityMultiplier(float)
@@ -3005,7 +3031,7 @@ void ezSliderComponent::set_Axis(ezBasisAxis)
 void ezSliderComponent::set_Deceleration(float)
 void ezSliderComponent::set_Distance(float)
 void ezSliderComponent::set_RandomStart(ezTime)
-void ezSound::PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation = 1, float Pitch = 1, float Volume = 1, bool BlockToLoad = false)
+void ezSound::PlaySound(ezStringView Resource, ezVec3 GlobalPosition, ezQuat GlobalRotation = ezQuat::MakeIdentity(), float Pitch = 1, float Volume = 1, bool BlockToLoad = false)
 void ezSpatial::FindObjectsInSphere(ezStringView sCategory, const ezVec3&in vCenter, float fRadius, ReportObjectCB@ callback)
 void ezSpawnBoxComponent::StartSpawning()
 void ezSpawnBoxComponent::set_Duration(ezTime)
@@ -3148,6 +3174,7 @@ void ezTwoBoneIKComponent::set_JointEnd(ezHashedString)
 void ezTwoBoneIKComponent::set_JointMiddle(ezHashedString)
 void ezTwoBoneIKComponent::set_JointStart(ezHashedString)
 void ezTwoBoneIKComponent::set_MidAxis(ezBasisAxis)
+void ezTwoBoneIKComponent::set_Order(uint16)
 void ezTwoBoneIKComponent::set_Weight(float)
 void ezVec2::MakeOrthogonalTo(const ezVec2&in)
 void ezVec2::Normalize()

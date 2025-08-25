@@ -58,10 +58,13 @@ DoubleZeroToOneInclusive
 DropGrabbedObject
 EndsWith
 EndsWith_NoCase
+EnsureNavMeshSectorAvailable
 ExpandAndGetRef
+FadeJointMotorStrength
 FadeOut
 FindChildByName
 FindChildByPath
+FindRandomPointAroundCircle
 FireTransitionEvent
 FloatMinMax
 FloatVariance
@@ -91,6 +94,8 @@ GetCurrentInputState
 GetCurrentState
 GetDarker
 GetDegree
+GetDetectedObject
+GetDetectedObjectsCount
 GetDistanceTo
 GetElementCount
 GetEntryValue_asAngle
@@ -123,6 +128,7 @@ GetHandle
 GetHours
 GetInverse
 GetInvertedColor
+GetJointMotorStrength
 GetLastGlobalTransform
 GetLength
 GetLengthAndNormalize
@@ -173,9 +179,12 @@ GetSpeed
 GetSquaredDistanceTo
 GetStableRandomSeed
 GetState
+GetSteeringPosition
+GetSteeringRotation
 GetSubString
 GetTeamID
 GetTimeDiff
+GetTurnAngleTowards
 GetUniqueID
 GetValue_asAngle
 GetValue_asBool
@@ -275,6 +284,7 @@ PostMessageRecursive
 Prepend
 PrependFormat
 PushBack
+RaycastNavMesh
 ReconstructFromMat3
 ReconstructFromMat4
 RecreatePhysicsShapes
@@ -298,6 +308,7 @@ SendMessage
 SendMessageRecursive
 Set
 SetActiveFlag
+SetAnimationClipOverride
 SetCount
 SetDestination
 SetDirectionForwards
@@ -313,6 +324,7 @@ SetGlobalTransform
 SetGlobalTransformToLookAt
 SetIdentity
 SetInitialImpulse
+SetJointMotorStrength
 SetJointTypeOverride
 SetLocalPosition
 SetLocalRotation

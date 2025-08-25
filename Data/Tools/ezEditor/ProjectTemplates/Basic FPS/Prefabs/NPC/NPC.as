@@ -125,7 +125,9 @@ class NPC : ezAngelScriptClass
 
         if (Health <= 0)
         {
-            ezPrefabs::SpawnPrefab("{ 3d758985-7126-92f0-1cc1-36dcd5419ee1 }", GetOwner().GetGlobalTransform(), ezVec3(0, 0, 0.9f), ezQuat::MakeIdentity());
+            ezTransform pos = GetOwner().GetGlobalTransform();
+            pos.m_vPosition += ezVec3(0, 0, 0.9f);
+            ezPrefabs::SpawnPrefab("{ 3d758985-7126-92f0-1cc1-36dcd5419ee1 }", pos);
 
             ezMsgDeleteGameObject del;
             GetOwner().PostMessage(del, ezTime::Milliseconds(100));
