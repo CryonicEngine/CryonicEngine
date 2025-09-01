@@ -2,6 +2,7 @@
 
 #include <EditorEngineProcessFramework/EditorEngineProcessFrameworkDLL.h>
 #include <Foundation/Communication/Event.h>
+#include <Foundation/Communication/IpcProcessMessageProtocol.h>
 #include <Foundation/Time/Time.h>
 #include <Foundation/Types/Delegate.h>
 #include <Foundation/Types/UniquePtr.h>
@@ -32,11 +33,13 @@ public:
   struct Event
   {
     const ezProcessMessage* m_pMessage;
+    // Set to true in a message handler to cancel the ProcessMessages function and return to the caller before all messages have been processed.
+    mutable bool m_bInterruptMessageProcessing = false;
   };
 
   ezEvent<const Event&> m_Events;
 
-  void MessageFunc(const ezProcessMessage* pMsg);
+  void MessageFunc(const ezIpcProcessMessageProtocol::Event& msg);
 
 protected:
   ezUniquePtr<ezIpcProcessMessageProtocol> m_pProtocol;
