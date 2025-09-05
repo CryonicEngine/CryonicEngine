@@ -1,5 +1,6 @@
 #include <RendererCore/RendererCorePCH.h>
 
+#include <Foundation/Math/CurveFunctions.h>
 #include <RendererCore/AnimationSystem/AnimGraph/AnimController.h>
 #include <RendererCore/AnimationSystem/AnimGraph/AnimGraph.h>
 #include <RendererCore/AnimationSystem/AnimGraph/AnimGraphInstance.h>
@@ -106,9 +107,26 @@ void ezSwitchPoseAnimNode::Step(ezAnimController& ref_controller, ezAnimGraphIns
 
   if (iDstIdx != pInstance->m_iTransitionToIndex)
   {
-    pInstance->m_iTransitionFromIndex = pInstance->m_iTransitionToIndex;
-    pInstance->m_iTransitionToIndex = iDstIdx;
-    pInstance->m_TransitionTime = ezTime::MakeZero();
+    if (iDstIdx == pInstance->m_iTransitionFromIndex)
+    {
+      // if we transition back to the previous index, just reverse the transition
+      pInstance->m_iTransitionFromIndex = pInstance->m_iTransitionToIndex;
+      pInstance->m_iTransitionToIndex = iDstIdx;
+      pInstance->m_TransitionTime = ezMath::Max(ezTime::MakeZero(), m_TransitionDuration - pInstance->m_TransitionTime);
+    }
+    else if (pInstance->m_TransitionTime < m_TransitionDuration * 0.5)
+    {
+      // if we are still in the first half of the transition, switch the target index,
+      // but keep the source index and transition time
+      pInstance->m_iTransitionToIndex = iDstIdx;
+    }
+    else
+    {
+      // otherwise just start a new transition from the current target to the new target
+      pInstance->m_TransitionTime = ezTime::MakeZero();
+      pInstance->m_iTransitionFromIndex = pInstance->m_iTransitionToIndex;
+      pInstance->m_iTransitionToIndex = iDstIdx;
+    }
   }
 
   if (pInstance->m_TransitionTime >= m_TransitionDuration)
@@ -116,7 +134,6 @@ void ezSwitchPoseAnimNode::Step(ezAnimController& ref_controller, ezAnimGraphIns
     pInstance->m_iTransitionFromIndex = pInstance->m_iTransitionToIndex;
   }
 
-  EZ_ASSERT_DEBUG(pInstance->m_iTransitionToIndex >= 0 && pInstance->m_iTransitionToIndex < (ezInt32)pPins.GetCount(), "Invalid pose index");
   EZ_ASSERT_DEBUG(pInstance->m_iTransitionToIndex >= 0 && pInstance->m_iTransitionToIndex < (ezInt32)pPins.GetCount(), "Invalid pose index");
 
   ezInt8 iTransitionFromIndex = pInstance->m_iTransitionFromIndex;
@@ -155,7 +172,8 @@ void ezSwitchPoseAnimNode::Step(ezAnimController& ref_controller, ezAnimGraphIns
 
     ezAnimGraphPinDataLocalTransforms* pPinData = ref_controller.AddPinDataLocalTransforms();
 
-    const float fLerp = (float)ezMath::Clamp(pInstance->m_TransitionTime.GetSeconds() / m_TransitionDuration.GetSeconds(), 0.0, 1.0);
+    const float fLerp0 = (float)ezMath::Clamp(pInstance->m_TransitionTime.GetSeconds() / m_TransitionDuration.GetSeconds(), 0.0, 1.0);
+    const float fLerp = static_cast<float>(ezMath::GetCurveValue_EaseInOutCubic(fLerp0));
 
     auto& cmd = ref_controller.GetPoseGenerator().AllocCommandCombinePoses();
     cmd.m_InputWeights.SetCount(2);
