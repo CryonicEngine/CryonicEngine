@@ -22,6 +22,10 @@ Panel.AssetCurator;Asset Curator
 Panel.CVar;CVars
 Panel.LongOps;Background Operations
 
+# Property Widget
+CONTAINER_AddEntry;{0}: Add Entry
+POINTERWIDGET_Create;Create
+
 # Menus
 
 G.Project;&Project
