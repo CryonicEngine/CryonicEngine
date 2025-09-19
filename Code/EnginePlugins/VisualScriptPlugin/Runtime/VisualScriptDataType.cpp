@@ -141,6 +141,7 @@ namespace
     "", // Count,
     "Enum",
     "Bitflag",
+    "Resource",
   };
   static_assert(EZ_ARRAY_SIZE(s_ScriptDataTypeNames) == (size_t)ezVisualScriptDataType::ExtendedCount);
 } // namespace
@@ -259,6 +260,7 @@ const ezRTTI* ezVisualScriptDataType::GetRtti(Enum dataType)
     nullptr,                                    // Count,
     nullptr,                                    // EnumValue,
     nullptr,                                    // BitflagValue,
+    nullptr,                                    // Resource,
   };
   static_assert(EZ_ARRAY_SIZE(s_Rttis) == (size_t)ezVisualScriptDataType::ExtendedCount);
 
@@ -338,11 +340,11 @@ bool ezVisualScriptDataType::CanConvertTo(Enum sourceDataType, Enum targetDataTy
       targetDataType == Variant)
     return true;
 
-  if ((IsNumber(sourceDataType) || (sourceDataType == EnumValue || sourceDataType == BitflagValue)) &&
-      (IsNumber(targetDataType) || (targetDataType == EnumValue || targetDataType == BitflagValue)))
+  if ((IsNumberOrBool(sourceDataType) || (sourceDataType == EnumValue || sourceDataType == BitflagValue)) &&
+      (IsNumberOrBool(targetDataType) || (targetDataType == EnumValue || targetDataType == BitflagValue)))
     return true;
 
-  if ((IsNumber(sourceDataType) && targetDataType == Vector3) ||
+  if ((IsNumberOrBool(sourceDataType) && targetDataType == Vector3) ||
       (sourceDataType == Vector3 && targetDataType == Transform))
     return true;
 

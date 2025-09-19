@@ -1,5 +1,6 @@
 #include <EditorPluginAssets/EditorPluginAssetsPCH.h>
 
+#include <EditorPluginVisualScript/VisualScriptClassAsset/VisualScriptClassAsset.h>
 #include <EditorPluginVisualScript/VisualScriptGraph/VisualScriptGraph.h>
 #include <EditorPluginVisualScript/VisualScriptGraph/VisualScriptVariable.moc.h>
 #include <Foundation/SimdMath/SimdRandom.h>
@@ -130,12 +131,16 @@ bool ezVisualScriptNodeManager::IsFilteredByBaseClass(const ezRTTI* pNodeType, c
 
 ezVisualScriptDataType::Enum ezVisualScriptNodeManager::GetVariableType(ezTempHashedString sName) const
 {
-  ezVariant defaultValue;
-  GetVariableDefaultValue(sName, defaultValue).IgnoreResult();
-  return ezVisualScriptDataType::FromVariantType(defaultValue.GetType());
+  ezVisualScriptVariable variable;
+  if (GetVariable(sName, variable).Succeeded())
+  {
+    return variable.m_TypeDecl.GetDataType();
+  }
+
+  return ezVisualScriptDataType::Invalid;
 }
 
-ezResult ezVisualScriptNodeManager::GetVariableDefaultValue(ezTempHashedString sName, ezVariant& out_value) const
+ezResult ezVisualScriptNodeManager::GetVariable(ezTempHashedString sName, ezVisualScriptVariable& out_variable) const
 {
   if (GetRootObject()->GetChildren().IsEmpty() == false)
   {
@@ -155,7 +160,9 @@ ezResult ezVisualScriptNodeManager::GetVariableDefaultValue(ezTempHashedString s
       if (nameVar.IsA<ezHashedString>() == false || nameVar.Get<ezHashedString>() != sName)
         continue;
 
-      out_value = pVariableObject->GetTypeAccessor().GetValue("DefaultValue");
+      out_variable.m_sName = nameVar.Get<ezHashedString>();
+      out_variable.m_TypeDecl = pVariableObject->GetTypeAccessor().GetValue("Type").Get<ezVisualScriptVariableTypeDeclaration>();
+      out_variable.m_DefaultValue = pVariableObject->GetTypeAccessor().GetValue("DefaultValue");
       return EZ_SUCCESS;
     }
   }
@@ -183,8 +190,8 @@ void ezVisualScriptNodeManager::GetAllVariables(ezDynamicArray<ezVisualScriptVar
 
       auto& variable = out_variables.ExpandAndGetRef();
       variable.m_sName = pVariableObject->GetTypeAccessor().GetValue("Name").ConvertTo<ezHashedString>();
+      variable.m_TypeDecl = pVariableObject->GetTypeAccessor().GetValue("Type").Get<ezVisualScriptVariableTypeDeclaration>();
       variable.m_DefaultValue = pVariableObject->GetTypeAccessor().GetValue("DefaultValue");
-      variable.m_bExpose = pVariableObject->GetTypeAccessor().GetValue("Expose").ConvertTo<bool>();
     }
   }
 }
@@ -598,14 +605,24 @@ void ezVisualScriptNodeManager::PropertyEventsHandler(const ezDocumentObjectProp
   {
     DeductNodeTypeAndAllPinTypes(e.m_pObject);
   }
-  else if (e.m_sProperty == "Name" || e.m_sProperty == "DefaultValue") // a variable's name or default value has changed, re-run type deduction
+  else if (e.m_pObject->GetType() == ezGetStaticRTTI<ezVisualScriptVariable>() && (e.m_sProperty == "Name" || e.m_sProperty == "Type"))
   {
+    // a variable's name or type has changed, re-run type deduction
     for (auto pObject : GetRootObject()->GetChildren())
     {
       if (IsNode(pObject) == false)
         continue;
 
       DeductNodeTypeAndAllPinTypes(pObject);
+    }
+
+    if (e.m_sProperty == "Type")
+    {
+      auto typeDecl = e.m_NewValue.Get<ezVisualScriptVariableTypeDeclaration>();
+      ezVariant defaultValue = e.m_pObject->GetTypeAccessor().GetValue("DefaultValue");
+      ezVisualScriptVariable::ConvertDefaultValue(defaultValue, typeDecl);
+
+      GetDocument()->GetObjectAccessor()->SetValueByName(e.m_pObject, "DefaultValue", defaultValue).AssertSuccess();
     }
   }
 }

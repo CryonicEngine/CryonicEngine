@@ -28,6 +28,9 @@ namespace
     if (result == ezVisualScriptDataType::EnumValue || result == ezVisualScriptDataType::BitflagValue)
       result = ezVisualScriptDataType::Int64;
 
+    if (result == ezVisualScriptDataType::Resource)
+      result = ezVisualScriptDataType::String;
+
     return result;
   }
 
@@ -85,8 +88,8 @@ namespace
 
     ezStringView sName = inout_astNode.m_Value.Get<ezString>().GetView();
 
-    ezVariant defaultValue;
-    if (static_cast<const ezVisualScriptNodeManager*>(pObject->GetDocumentObjectManager())->GetVariableDefaultValue(ezTempHashedString(sName), defaultValue).Failed())
+    ezVisualScriptVariable v;
+    if (static_cast<const ezVisualScriptNodeManager*>(pObject->GetDocumentObjectManager())->GetVariable(ezTempHashedString(sName), v).Failed())
     {
       ezLog::Error("Invalid variable named '{}'", sName);
       return EZ_FAILURE;
@@ -769,10 +772,16 @@ ezResult ezVisualScriptCompiler::BuildInstanceDataMapping()
 
   for (auto& variable : variables)
   {
-    ezVisualScriptInstanceData instanceData;
-    auto dataType = ezVisualScriptDataType::FromVariantType(variable.m_DefaultValue.GetType());
+    auto dataType = variable.m_TypeDecl.GetDataType();
+
+    EZ_ASSERT_DEV(dataType == ezVisualScriptDataType::Variant ||
+                    ((dataType == ezVisualScriptDataType::GameObject || dataType == ezVisualScriptDataType::Component) && variable.m_DefaultValue.IsValid() == false) ||
+                    dataType == ezVisualScriptDataType::FromVariantType(variable.m_DefaultValue.GetType()),
+      "Data type mismatch");
 
     auto& offsetAndCount = m_Module.m_InstanceDataDesc.m_PerTypeInfo[dataType];
+
+    ezVisualScriptInstanceData instanceData;
     instanceData.m_DataOffset.m_uiByteOffset = offsetAndCount.m_uiCount;
     instanceData.m_DataOffset.m_uiType = dataType;
     instanceData.m_DataOffset.m_uiSource = DataOffset::Source::Instance;
@@ -1165,7 +1174,7 @@ ezResult ezVisualScriptCompiler::InsertTypeConversions(AstNode* pEntryAstNode)
 
         if (dataOutput.m_DataOffset.GetType() != inputDataType)
         {
-          if (ezVisualScriptDataType::IsNumber(outputDataType) && inputDataType == ezVisualScriptDataType::Vector3)
+          if (ezVisualScriptDataType::IsNumberOrBool(outputDataType) && inputDataType == ezVisualScriptDataType::Vector3)
           {
             AstNode* pSourceNode = dataInput.m_pSourceNode;
             ezUInt32 uiSourcePinIndex = dataInput.m_uiSourcePinIndex;
