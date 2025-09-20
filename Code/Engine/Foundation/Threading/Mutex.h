@@ -52,12 +52,18 @@ public:
   EZ_ALWAYS_INLINE void Lock() {}
 
   /// \brief Implements the 'TryLock' interface function, but does nothing.
-  EZ_ALWAYS_INLINE ezResult TryLock() { return EZ_SUCCESS; }
+  EZ_ALWAYS_INLINE ezResult TryLock()
+  {
+    return EZ_SUCCESS;
+  }
 
   /// \brief Implements the 'Release' interface function, but does nothing.
   EZ_ALWAYS_INLINE void Unlock() {}
 
-  EZ_ALWAYS_INLINE bool IsLocked() const { return false; }
+  EZ_ALWAYS_INLINE bool IsLocked() const
+  {
+    return false;
+  }
 };
 
 #include <Mutex_Platform.h>
