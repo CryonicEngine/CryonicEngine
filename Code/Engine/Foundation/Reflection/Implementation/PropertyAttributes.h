@@ -730,6 +730,35 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 
+class EZ_FOUNDATION_DLL ezSplineManipulatorAttribute : public ezManipulatorAttribute
+{
+  EZ_ADD_DYNAMIC_REFLECTION(ezSplineManipulatorAttribute, ezManipulatorAttribute);
+
+public:
+  ezSplineManipulatorAttribute();
+  ezSplineManipulatorAttribute(const char* szNodesProperty, const char* szClosedProperty, const char* szBindTo);
+
+  const ezUntrackedString& GetNodesProperty() const { return m_sProperty1; }
+  const ezUntrackedString& GetClosedProperty() const { return m_sProperty2; }
+  const ezUntrackedString& GetBindTo() const { return m_sProperty3; }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class EZ_FOUNDATION_DLL ezSplineTangentManipulatorAttribute : public ezManipulatorAttribute
+{
+  EZ_ADD_DYNAMIC_REFLECTION(ezSplineTangentManipulatorAttribute, ezManipulatorAttribute);
+
+public:
+  ezSplineTangentManipulatorAttribute();
+  ezSplineTangentManipulatorAttribute(const char* szTangentMode, const char* szCustomTangent);
+
+  const ezUntrackedString& GetTangentModeProperty() const { return m_sProperty1; }
+  const ezUntrackedString& GetCustomTangentProperty() const { return m_sProperty2; }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 struct ezVisualizerAnchor
 {
   using StorageType = ezUInt8;
