@@ -8,16 +8,20 @@
 #  include <Foundation/Logging/Log.h>
 #  include <Foundation/Platform/Win/Utils/IncludeWindows.h>
 #  include <Foundation/Strings/StringConversion.h>
+#  include <Foundation/Threading/ThreadUtils.h>
 
 // clang-format off
 EZ_BEGIN_DYNAMIC_REFLECTED_TYPE(ezStandardInputDevice, 1, ezRTTINoAllocator)
 EZ_END_DYNAMIC_REFLECTED_TYPE;
 // clang-format on
 
+#  define WM_USER_UPDATE_CURSOR (WM_USER + 1)
+
 bool ezStandardInputDevice::s_bMainWindowUsed = false;
 
-ezStandardInputDevice::ezStandardInputDevice(ezUInt32 uiWindowNumber)
+ezStandardInputDevice::ezStandardInputDevice(ezUInt32 uiWindowNumber, ezMinWindows::HWND hWnd)
 {
+  m_hWnd = hWnd;
   m_uiWindowNumber = uiWindowNumber;
 
   if (uiWindowNumber == 0)
@@ -574,6 +578,10 @@ void ezStandardInputDevice::WindowMessage(ezMinWindows::HWND hWnd, ezMinWindows:
 
 #  endif
 
+    case WM_USER_UPDATE_CURSOR:
+      ShowCursor(static_cast<BOOL>(wparam));
+      return;
+
     case WM_INPUT:
     {
       ezUInt32 uiSize = 0;
@@ -901,7 +909,15 @@ void ezStandardInputDevice::SetShowMouseCursor(bool bShow)
     return;
 
   m_bShowCursor = bShow;
-  ShowCursor(m_bShowCursor);
+
+  if (ezThreadUtils::IsMainThread())
+  {
+    ShowCursor(m_bShowCursor);
+  }
+  else
+  {
+    PostMessageW(ezMinWindows::ToNative(m_hWnd), WM_USER_UPDATE_CURSOR, m_bShowCursor ? 1 : 0, 0);
+  }
 }
 
 bool ezStandardInputDevice::GetShowMouseCursor() const
