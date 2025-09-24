@@ -28,6 +28,12 @@
 #include <Texture/Image/Formats/TgaFileFormat.h>
 #include <Texture/Image/Image.h>
 
+#ifdef BUILDSYSTEM_ENABLE_IMGUI_SUPPORT
+#  include <GameEngine/Console/ImGuiConsole.h>
+#  include <GameEngine/DearImgui/DearImgui.h>
+#  define USE_IMGUI_CONSOLE 1
+#endif
+
 ezGameApplication* ezGameApplication::s_pGameApplicationInstance = nullptr;
 ezDelegate<ezGALDevice*(const ezGALDeviceCreationDescription&)> ezGameApplication::s_DefaultDeviceCreator;
 
@@ -396,7 +402,9 @@ bool ezGameApplication::Run_ProcessApplicationInput()
     m_bShowConsole = !m_bShowConsole;
 
     if (m_bShowConsole)
+    {
       ezInputManager::SetExclusiveInputSet("Console");
+    }
     else
     {
       ezInputManager::SetExclusiveInputSet("");
