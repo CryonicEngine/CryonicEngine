@@ -204,7 +204,7 @@ void OnLoadPlugin()
 
   // View Tool Bar
   ezActionMapManager::RegisterActionMap("EditorPluginScene_ViewToolBar", "AssetViewToolbar");
-  ezViewActions::MapToolbarActions("EditorPluginScene_ViewToolBar", ezViewActions::PerspectiveMode | ezViewActions::RenderMode | ezViewActions::ActivateRemoteProcess);
+  ezViewActions::MapToolbarActions("EditorPluginScene_ViewToolBar", ezViewActions::PerspectiveMode | ezViewActions::RenderMode /*| ezViewActions::ActivateRemoteProcess*/);
   ezQuadViewActions::MapToolbarActions("EditorPluginScene_ViewToolBar");
 
   // Visualizers

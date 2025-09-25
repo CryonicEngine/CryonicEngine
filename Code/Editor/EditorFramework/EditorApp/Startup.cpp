@@ -134,7 +134,7 @@ EZ_BEGIN_SUBSYSTEM_DECLARATION(EditorFramework, EditorFrameworkMain)
       // Convenience mapping that adds the most common view settings:
       const char* szSimpleViewToolbar = "SimpleAssetViewToolbar";
       ezActionMapManager::RegisterActionMap(szSimpleViewToolbar, "AssetViewToolbar");
-      ezViewActions::MapToolbarActions(szSimpleViewToolbar, ezViewActions::RenderMode | ezViewActions::ActivateRemoteProcess);
+      ezViewActions::MapToolbarActions(szSimpleViewToolbar, ezViewActions::RenderMode /*| ezViewActions::ActivateRemoteProcess*/);
       ezViewLightActions::MapToolbarActions(szSimpleViewToolbar);
     }
 
