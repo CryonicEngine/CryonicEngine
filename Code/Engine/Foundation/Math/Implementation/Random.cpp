@@ -275,3 +275,6 @@ void ezRandomGauss::Load(ezStreamReader& inout_stream)
 
   m_Generator.Load(inout_stream);
 }
+
+
+EZ_STATICLINK_FILE(Foundation, Foundation_Math_Implementation_Random);

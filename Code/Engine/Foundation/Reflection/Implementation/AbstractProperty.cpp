@@ -11,3 +11,6 @@ ezAbstractProperty ::~ezAbstractProperty()
     delete pAttrib;
   }
 }
+
+
+EZ_STATICLINK_FILE(Foundation, Foundation_Reflection_Implementation_AbstractProperty);
