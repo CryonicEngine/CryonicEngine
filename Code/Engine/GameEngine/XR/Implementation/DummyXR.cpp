@@ -1,6 +1,7 @@
 #include <GameEngine/GameEnginePCH.h>
 
 #include <Core/GameApplication/GameApplicationBase.h>
+#include <Core/System/WindowManager.h>
 #include <Core/World/World.h>
 #include <Foundation/Utilities/GraphicsUtils.h>
 #include <GameEngine/Configuration/XRConfig.h>
@@ -41,6 +42,8 @@ ezResult ezDummyXR::Initialize()
 
 void ezDummyXR::Deinitialize()
 {
+  ezWindowManager::GetSingleton()->CloseAll(this);
+
   m_bInitialized = false;
   if (m_GALdeviceEventsId != 0)
   {
@@ -72,7 +75,7 @@ bool ezDummyXR::SupportsCompanionView()
   return true;
 }
 
-ezUniquePtr<ezActor> ezDummyXR::CreateActor(ezView* pView, ezGALMSAASampleCount::Enum msaaCount, ezUniquePtr<ezWindowBase> pCompanionWindow, ezUniquePtr<ezWindowOutputTargetGAL> pCompanionWindowOutput)
+ezRegisteredWndHandle ezDummyXR::CreateXRWindow(ezView* pView, ezGALMSAASampleCount::Enum msaaCount, ezUniquePtr<ezWindowBase> pCompanionWindow, ezUniquePtr<ezWindowOutputTargetGAL> pCompanionWindowOutput)
 {
   EZ_ASSERT_DEV(IsInitialized(), "Need to call 'Initialize' first.");
   ezGALDevice* pDevice = ezGALDevice::GetDefaultDevice();
@@ -97,13 +100,12 @@ ezUniquePtr<ezActor> ezDummyXR::CreateActor(ezView* pView, ezGALMSAASampleCount:
     m_pCameraToSynchronize->SetCameraMode(ezCameraMode::Stereo, m_pCameraToSynchronize->GetFovOrDim(), m_pCameraToSynchronize->GetNearPlane(), m_pCameraToSynchronize->GetFarPlane());
   }
 
-  ezUniquePtr<ezActor> pActor = EZ_DEFAULT_NEW(ezActor, "DummyXR", this);
   EZ_ASSERT_DEV((pCompanionWindow != nullptr) == (pCompanionWindowOutput != nullptr), "Both companionWindow and companionWindowOutput must either be null or valid.");
 
-  ezUniquePtr<ezActorPluginWindowXR> pActorPlugin = EZ_DEFAULT_NEW(ezActorPluginWindowXR, this, std::move(pCompanionWindow), std::move(pCompanionWindowOutput));
-  m_pCompanion = static_cast<ezWindowOutputTargetXR*>(pActorPlugin->GetOutputTarget());
+  ezUniquePtr<ezWindowXR> pXRWindow = EZ_DEFAULT_NEW(ezWindowXR, this, std::move(pCompanionWindow));
+  ezUniquePtr<ezWindowOutputTargetXR> pXRWindowOutputTarget = EZ_DEFAULT_NEW(ezWindowOutputTargetXR, this, std::move(pCompanionWindowOutput));
 
-  pActor->AddPlugin(std::move(pActorPlugin));
+  m_pCompanion = static_cast<ezWindowOutputTargetXR*>(pXRWindowOutputTarget.Borrow());
 
   m_hView = pView->GetHandle();
 
@@ -114,7 +116,13 @@ ezUniquePtr<ezActor> ezDummyXR::CreateActor(ezView* pView, ezGALMSAASampleCount:
 
   pView->SetViewport(ezRectFloat((float)m_Info.m_vEyeRenderTargetSize.width, (float)m_Info.m_vEyeRenderTargetSize.height));
 
-  return std::move(pActor);
+  auto pWinMan = ezWindowManager::GetSingleton();
+  ezRegisteredWndHandle id = pWinMan->Register("DummyXR", this, std::move(pXRWindow));
+  pWinMan->SetOutputTarget(id, std::move(pXRWindowOutputTarget));
+  pWinMan->SetDestroyCallback(id, [this](ezRegisteredWndHandle)
+    { this->OnActorDestroyed(); });
+
+  return id;
 }
 
 ezGALTextureHandle ezDummyXR::GetCurrentTexture()
