@@ -15,6 +15,29 @@
 #  include <RendererCore/RenderWorld/RenderWorld.h>
 #  include <RendererCore/Textures/Texture2DResource.h>
 
+//////////////////////////////////////////////////////////////////////////
+
+// clang-format off
+EZ_BEGIN_SUBSYSTEM_DECLARATION(GameEngine, ImGui)
+
+  BEGIN_SUBSYSTEM_DEPENDENCIES
+    "Foundation"
+  END_SUBSYSTEM_DEPENDENCIES
+
+  ON_HIGHLEVELSYSTEMS_SHUTDOWN
+  {
+    if (ezImgui::GetSingleton() != nullptr)
+    {
+      ezImgui* pImgui = ezImgui::GetSingleton();
+      EZ_DEFAULT_DELETE(pImgui);
+    }
+  }
+
+EZ_END_SUBSYSTEM_DECLARATION;
+// clang-format on
+
+//////////////////////////////////////////////////////////////////////////
+
 namespace
 {
   void* ezImguiAllocate(size_t uiSize, void* pUserData)

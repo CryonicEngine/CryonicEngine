@@ -44,16 +44,6 @@ void SampleGameState::OnDeactivation()
 {
   EZ_LOG_BLOCK("GameState::Deactivate");
 
-// BEGIN-DOCS-CODE-SNIPPET: imgui-dealloc
-#ifdef BUILDSYSTEM_ENABLE_IMGUI_SUPPORT
-  if (ezImgui::GetSingleton() != nullptr)
-  {
-    ezImgui* pImgui = ezImgui::GetSingleton();
-    EZ_DEFAULT_DELETE(pImgui);
-  }
-#endif
-  // END-DOCS-CODE-SNIPPET
-
   SUPER::OnDeactivation();
 }
 
