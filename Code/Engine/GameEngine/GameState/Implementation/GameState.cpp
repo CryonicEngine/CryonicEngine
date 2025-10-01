@@ -3,6 +3,7 @@
 
 #include <Core/GameApplication/GameApplicationBase.h>
 #include <Core/GameState/GameStateWindow.h>
+#include <Core/Input/DeviceTypes/MouseKeyboard.h>
 #include <Core/Prefabs/PrefabResource.h>
 #include <Core/System/WindowManager.h>
 #include <Core/World/World.h>
@@ -497,8 +498,11 @@ ezUniquePtr<ezWindow> ezGameState::CreateMainWindow()
   ezUniquePtr<ezGameStateWindow> pWindow = EZ_DEFAULT_NEW(ezGameStateWindow, wndDesc, [] {});
   pWindow->ResetOnClickClose([this]()
     { this->RequestQuit("window"); });
-  if (pWindow->GetInputDevice())
-    pWindow->GetInputDevice()->SetMouseSpeed(ezVec2(0.02f));
+
+  if (auto pInput = ezDynamicCast<ezInputDeviceMouseKeyboard*>(pWindow->GetInputDevice()))
+  {
+    pInput->SetMouseSpeed(ezVec2(0.02f));
+  }
 
   return pWindow;
 }
