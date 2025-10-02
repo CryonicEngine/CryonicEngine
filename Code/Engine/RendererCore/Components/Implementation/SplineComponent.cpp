@@ -517,7 +517,7 @@ void ezSplineComponent::DrawDebugTangents(ezUInt32 uiPointIndex, ezSplineTangent
     const ezVec3 vTangentOut = ezSimdConversion::ToVec3(cp.m_vPosTangentOut);
 
     const ezVec3 vGlobalPos = ezSimdConversion::ToVec3(GetOwner()->GetGlobalTransformSimd().TransformPosition(cp.m_vPos));
-    const ezTransform t = ezTransform::Make(vGlobalPos);
+    const ezTransform t = ezTransform::Make(vGlobalPos, GetOwner()->GetGlobalRotation(), GetOwner()->GetGlobalScaling());
 
     ezDebugRenderer::DrawLineSphere(GetWorld(), ezBoundingSphere::MakeFromCenterAndRadius(vTangentIn, 0.05f), tInColor, t);
     ezDebugRenderer::DrawLineSphere(GetWorld(), ezBoundingSphere::MakeFromCenterAndRadius(vTangentOut, 0.05f), tOutColor, t);
