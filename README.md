@@ -66,8 +66,6 @@ See the [releases](https://github.com/CryonicEngine/CryonicEngine/releases) page
 - **API Reference:** [Code API Documentation](https://ezengine.github.io/api-docs/)
 - **Editor Overview:** [Feature-rich Editor Guide](http://ezengine.net/pages/getting-started/editor-overview.html)
 - **Samples:** [Available Sample Projects](https://ezengine.net/pages/samples/samples-overview.html)
-- **Screenshots:** [Gallery](https://ezengine.net/pages/samples/screenshots.html)
-- **Tutorial Videos:** [YouTube Channel](https://www.youtube.com/@ezEngine)
 - **FAQ:** [Frequently Asked Questions](https://ezengine.net/pages/getting-started/faq.html)
 
 ## Contributing
