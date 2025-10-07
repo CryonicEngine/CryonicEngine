@@ -1,61 +1,118 @@
-# ezEngine
+# Cryonic Engine
 
-ezEngine is an open source C++ game engine.
+Cryonic Engine is an open source C++ game engine designed to facilitate game development with a focus on simplicity, flexibility, and modular architecture.
 
-Watch the trailer below for a quick feature overview:
-
-[![ezEngine Trailer](https://img.youtube.com/vi/S342o8ZmPdA/0.jpg)](https://www.youtube.com/watch?v=S342o8ZmPdA)
-
-Visit <http://ezEngine.net> for documentation, samples and detailed build instructions.
-
-![ezEngine Screenshot](https://ezengine.net/pages/samples/media/showcase-1.jpg)
-
-## Supported Platforms
-
-The full engine functionality is currently only available on Windows, because the renderer uses Direct3D 11. Work on porting the renderer to Vulkan is ongoing. There is an experimental Linux port of the editor, but it is not yet functional enough for productive use.
-
-All non-rendering related functionality compiles on Windows, Android, Linux and MacOS. See [this page](http://ezengine.net/pages/docs/build/supported-platforms.html) for details.
-
-## Prebuilt Binaries
-
-See the [releases](https://github.com/ezEngine/ezEngine/releases) for recent changes and prebuilt binaries. Note, however, that releases are infrequent and you are generally expected to build the engine yourself.
-
-## Building the Engine
-
-These are the instructions for Windows. For other platforms [see this page](https://ezengine.net/pages/docs/build/building-ez.html).
-
-Open a Windows Terminal to clone and build the engine:
-
-1. `git clone https://github.com/ezEngine/ezEngine.git`
-1. `cd ezEngine`
-1. `.\GenerateWin64vs2022.bat`
-1. Open the Visual Studio solution `Workspace\vs2022x64\ezEngine_vs2022x64.sln` and build everything.
-1. Launch the `Editor` project from Visual Studio and open one of the sample projects.
+![Cryonic Engine Screenshot](https://ezengine.net/pages/samples/media/showcase-1.jpg)
 
 ## Design Philosophy
 
-EZ is built in a modular way, enabling users to either use all available functionality, or to pick and choose individual features and build the rest themselves. Larger features are implemented through engine and editor plugins and can therefore easily be removed or replaced. For instance sound (Fmod), physics (Jolt) and particle effects are all provided through plugins.
+Cryonic Engine is built with modularity at its core, enabling developers to use all available functionality or selectively integrate individual features. The engine emphasizes:
 
-EZ puts a strong emphasis on a solid foundation that is both easy and efficient to use. Even if you do not use the rendering functionality, EZ has a lot to offer to build your own engine on top of.
+- **Simplicity:** Clean, easy-to-understand architecture accessible to developers of all skill levels
+- **Flexibility:** Modular design allowing easy customization and extension
+- **Solid Foundation:** Efficient core systems that provide value even when using custom rendering solutions
+- **Rapid Prototyping:** Feature-rich editor supporting both visual scripting and custom C++ code
 
-Finally, EZ comes with a [feature rich editor](http://ezengine.net/pages/getting-started/editor-overview.html) that makes it possible to quickly prototype your game using [visual scripting](https://ezengine.net/pages/docs/custom-code/visual-script/visual-script-overview.html) and [custom C++ code](https://ezengine.net/pages/docs/custom-code/cpp/cpp-project-generation.html).
+Larger features are implemented through engine and editor plugins, making them easy to remove or replace. Systems like sound (Fmod), physics (Jolt), and particle effects are all provided through this plugin architecture.
 
-## Screenshots, Videos, Samples
+## Supported Platforms
 
-* Here is [a variety of pretty pictures](https://ezengine.net/pages/samples/screenshots.html).
-* For tutorial videos, see [our YouTube channel](https://www.youtube.com/@ezEngine).
-* Available sample projects are [listed in our documentation](https://ezengine.net/pages/samples/samples-overview.html)
+The full engine functionality is currently available on Windows with Direct3D 11 rendering. Work on porting the renderer to Vulkan is ongoing to expand platform support.
 
-## Documentation and FAQ
+All non-rendering related functionality compiles on Windows, Android, Linux, and MacOS. See the [platform documentation](http://ezEngine.net/pages/docs/build/supported-platforms.html) for details.
 
-* For high-level feature documentation see [our website](https://ezengine.net/pages/docs/docs-overview.html).
-* Code API documentation is [available here](https://ezengine.github.io/api-docs/).
-* Also see the page of [frequently asked questions](https://ezengine.net/pages/getting-started/faq.html).
+**Current Build Support:**
+- Windows
+- Linux
+- macOS
+- Android
+- Web
+
+## Getting Started
+
+### Building the Engine (Windows)
+
+Open a Windows Terminal to clone and build the engine:
+
+1. `git clone https://github.com/ElectroGamesDev/Cryonic-Engine.git`
+2. `cd Cryonic-Engine`
+3. `.\GenerateWin64vs2022.bat`
+4. Open the Visual Studio solution `Workspace\vs2022x64\ezEngine_vs2022x64.sln` and build everything
+5. Launch the `Editor` project from Visual Studio and open one of the sample projects
+
+For other platforms and detailed build instructions, visit the [documentation](https://ezengine.net/pages/docs/build/building-ez.html).
+
+### Prebuilt Binaries
+
+See the [releases](https://github.com/CryonicEngine/CryonicEngine/releases) page for recent changes and prebuilt binaries.
+
+## Key Capabilities
+
+- **2D and 3D Rendering:** Powerful rendering capabilities for immersive game experiences
+- **GameObject-Component System:** Intuitive entity organization and behavior management
+- **Visual Scripting:** Node visual scripting is supported with Event Sheets in development
+- **Physics Integration:** Full 2D and 3D physics support
+- **Advanced Animation:** Complete 2D and 3D animation system
+- **Audio Playback:** Integrated sound system via Fmod
+- **Comprehensive Input:** Keyboard, mouse, and gamepad support
+- **Scene Management:** Robust scene loading and saving system
+- **Asset Management:** Efficient asset pipeline with hot reloading capabilities
+- **Visual Editor:** Feature-rich editor with advanced GUI editing tools
+- **Lighting & Shadows:** Complete lighting system with shadow mapping support
+
+## Documentation and Resources
+
+- **High-level Documentation:** [Cryonic Engine Documentation](https://ezengine.net/pages/docs/docs-overview.html)
+- **API Reference:** [Code API Documentation](https://ezengine.github.io/api-docs/)
+- **Editor Overview:** [Feature-rich Editor Guide](http://ezengine.net/pages/getting-started/editor-overview.html)
+- **Samples:** [Available Sample Projects](https://ezengine.net/pages/samples/samples-overview.html)
+- **Screenshots:** [Gallery](https://ezengine.net/pages/samples/screenshots.html)
+- **Tutorial Videos:** [YouTube Channel](https://www.youtube.com/@ezEngine)
+- **FAQ:** [Frequently Asked Questions](https://ezengine.net/pages/getting-started/faq.html)
 
 ## Contributing
 
-Contributions are always welcome. Please see [this page](https://ezengine.net/pages/getting-started/how-to-contribute.html) for details on how you can contribute.
+Cryonic Engine welcomes contributions from the community. Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
 
-## Contact
+**How to Contribute:**
+- Fork the repository and create a feature branch
+- Make your enhancements with clear, documented code
+- Submit a pull request with a detailed description of your changes
+- For guidelines and best practices, see the [contribution guide](https://ezengine.net/pages/getting-started/how-to-contribute.html)
 
-If you have a question, [contact us](http://ezengine.net/pages/contact.html).
+**Feedback:**
+- Bug reports and feature requests: Open an [issue](https://github.com/CryonicEngine/CryonicEngine/issues)
+- Questions and discussions: [Discord](https://discord.gg/Yqw52WDtW6) or [support@cryonicengine.com](mailto:support@cryonicengine.com).
+
+## License Summary
+[Click here for the full license](https://github.com/CryonicEngine/CryonicEngine/blob/main/LICENSE.md)
+
+### Key Points
+
+- **Usage:** You can use, modify, and distribute the Engine, Modifications, or Derived Engines for any purpose, including commercial projects.  
+- **Sublicensing:** Allowed only under the same license terms.  
+
+---
+
+### Splash Screen
+
+- **Every Product must display the Cryonic Engine Splash Screen for at startup.**  
+- Removal is only allowed with a **paid plan** that removes the slash screen. Unauthorized removal is a breach.
+
+---
+
+### Royalties
+
+- **Royalty Rate:** 4% on all revenue **above $250,000 USD per Product that uses the engine**.  
+- Applies to **any Product using the Engine or Derived Engine**, modified or unmodified.  
+
+---
+
+### ⚖️ Legal Notes
+
+- **Warranty:** Engine is provided "AS IS", without any warranty.  
+- **Liability:** Licensor is not liable for indirect or consequential damages.  
+
+---
+
+By using the Engine, you agree to the full Cryonic Engine License.
